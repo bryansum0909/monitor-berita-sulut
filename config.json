@@ -1,0 +1,52 @@
+{
+  "keywords": [
+    "manado",
+    "sulut",
+    "sulawesi utara",
+    "minahasa",
+    "bitung",
+    "tomohon",
+    "kotamobagu",
+    "bolaang mongondow",
+    "sangihe",
+    "talaud",
+    "siau",
+    "kawanua"
+  ],
+  "viral_markers": [
+    "viral",
+    "heboh",
+    "trending",
+    "geger",
+    "ramai",
+    "diserbu",
+    "trending topic",
+    "netizen",
+    "media sosial",
+    "viral di"
+  ],
+  "google_news_queries": [
+    "Manado",
+    "Sulawesi Utara",
+    "viral Manado",
+    "viral Sulut",
+    "berita Minahasa",
+    "Bitung",
+    "Tomohon",
+    "Kawanua"
+  ],
+  "rss_feeds": [
+    "https://www.antaranews.com/rss/top-news",
+    "https://news.detik.com/berita/rss",
+    "https://feed.liputan6.com/rss/news",
+    "https://www.cnnindonesia.com/nasional/rss",
+    "https://www.cnbcindonesia.com/news/rss",
+    "https://rss.tempo.co/nasional",
+    "https://www.suara.com/rss/news",
+    "https://www.jawapos.com/nasional/rss"
+  ],
+  "custom_rss_feeds": [
+    "https://beritamanado.com/feed/",
+    "https://manadopost.jawapos.com/feed"
+  ]
+}
