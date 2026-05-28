@@ -1,4 +1,13 @@
 {
-  "sent_ids": [],
-  "last_run": null
+  "sent_ids": [
+    "edf9aae8d3acdbde",
+    "43fce343e463bb09",
+    "f15f490537ee2bd0",
+    "9d5e01fd603d8735",
+    "9326667897c89f32",
+    "53f8683dcb4a3073",
+    "1a4dd572d2ff12c4",
+    "f963cec871768b5c"
+  ],
+  "last_run": "2026-05-28T19:48:38.912828+00:00"
 }
