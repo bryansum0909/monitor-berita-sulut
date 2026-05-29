@@ -39,14 +39,10 @@
     "https://www.antaranews.com/rss/top-news",
     "https://news.detik.com/berita/rss",
     "https://feed.liputan6.com/rss/news",
-    "https://www.cnnindonesia.com/nasional/rss",
-    "https://www.cnbcindonesia.com/news/rss",
     "https://rss.tempo.co/nasional",
-    "https://www.suara.com/rss/news",
     "https://www.jawapos.com/nasional/rss"
   ],
   "custom_rss_feeds": [
-    "https://beritamanado.com/feed/",
-    "https://manadopost.jawapos.com/feed"
+    "https://rss.app/feeds/b4Qp08lutnwaNBn0.xml"
   ]
 }
