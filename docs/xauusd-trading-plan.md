@@ -23,7 +23,7 @@ Yang bisa dan seharusnya dilakukan:
 | Pertanyaan | Jawaban |
 |---|---|
 | Bisa balik modal dalam 1 trade? | Tidak, kecuali risk 11,19% equity (RR 1:2) — dan itu langkah menuju MC |
-| Berapa trade realistis untuk balik modal? | **±5 trade menang di RR 1:2**, atau **±4 trade menang di RR 1:3** |
+| Berapa trade realistis untuk balik modal? | **6 trade menang di RR 1:2**, atau **4 trade menang di RR 1:3** |
 | Kunci utamanya apa? | Membatasi kerugian per trade jadi **≤1%**, supaya 10 loss beruntun cuma −9,6%, bukan −60% |
 | Setelah loss beruntun, lot dinaikkan atau diturunkan? | **Diturunkan.** Kebalikan dari naluri Anda |
 | SL untuk TP 8 point? | **4 point (40 pip)** untuk RR 1:2 — jangan dipaksa lebih kecil |
@@ -55,7 +55,7 @@ melonjak dari +22% jadi +38%. Trade ke-12 akan menuntut lot yang lebih besar lag
 Ini deret yang berakhir di Margin Call, bukan di breakeven.
 
 **Kesimpulan: buang target "balik modal di trade ke-11". Ganti dengan "balik modal dalam
-5–6 trade menang".**
+6 trade menang di RR 1:2, atau 4 trade menang di RR 1:3".**
 
 ---
 
@@ -66,24 +66,24 @@ pengaruhnya terhadap skenario 10 loss beruntun yang sama persis:
 
 | Risk/trade | Equity setelah 10 loss | Drawdown | Gain yang dibutuhkan | Trade menang @1:2 | Trade menang @1:3 |
 |---|---|---|---|---|---|
-| **0,5%** | 142.667 | −4,89% | +5,14% | ~5 | ~4 |
-| **1,0%** ✅ | 135.657 | −9,56% | +10,57% | ~5 | ~4 |
-| **2,0%** | 122.561 | −18,29% | +22,39% | ~5 | ~4 |
-| 3,0% | 110.614 | −26,26% | +35,61% | ~5 | ~4 |
-| 5,0% | 89.811 | −40,13% | +67,02% | ~5 | ~4 |
-| 10,0% ❌ | 52.302 | −65,13% | +186,80% | ~6 | ~4 |
+| **0,5%** | 142.667 | −4,89% | +5,14% | 6 | 4 |
+| **1,0%** ✅ | 135.657 | −9,56% | +10,57% | 6 | 4 |
+| **2,0%** | 122.561 | −18,29% | +22,39% | 6 | 4 |
+| 3,0% | 110.614 | −26,26% | +35,61% | 6 | 4 |
+| 5,0% | 89.811 | −40,13% | +67,02% | 6 | 4 |
+| 10,0% ❌ | 52.302 | −65,13% | +186,80% | 6 | 5 |
 
 ### Ini temuan paling penting di seluruh dokumen
 
 Lihat dua kolom terakhir. **Jumlah trade menang yang dibutuhkan untuk balik modal
-hampir sama (±5 di RR 1:2, ±4 di RR 1:3) — apa pun risk %-nya.**
+praktis identik — 6 di RR 1:2 dan 4 di RR 1:3 — apa pun risk %-nya.**
 
 Artinya: memperbesar risk **sama sekali tidak mempercepat** pemulihan Anda. Yang
 dilakukannya hanya membuat kerusakan lebih dalam dan membuat Anda lebih dekat ke titik
 di mana pemulihan jadi mustahil secara matematis.
 
-Risk 10% tidak membuat Anda pulih lebih cepat dari risk 1%. Sama-sama butuh ~5 trade
-menang. Bedanya: yang satu sudah kehilangan 65% modal, yang satu baru 9,6%.
+Risk 10% tidak membuat Anda pulih lebih cepat dari risk 1%. Sama-sama butuh 6 trade
+menang di RR 1:2. Bedanya: yang satu sudah kehilangan 65% modal, yang satu baru 9,6%.
 
 **Aturan: risk maksimum 1% per trade. Titik.**
 
@@ -241,19 +241,19 @@ butuh **+22,39%** untuk balik ke 150.000.
 
 | Winrate | RR | Ekspektansi/trade | Trade dibutuhkan |
 |---|---|---|---|
-| 50% | 1:2 | +0,50R | **~21 trade** |
-| 45% | 1:2 | +0,35R | ~31 trade |
-| 40% | 1:2 | +0,20R | ~57 trade |
-| **40%** | **1:3** | **+0,60R** | **~18 trade** ⭐ |
-| 35% | 1:3 | +0,40R | ~28 trade |
-| 30% | 1:3 | +0,20R | ~61 trade |
+| 50% | 1:2 | +0,50R | **22 trade** |
+| 45% | 1:2 | +0,35R | 31 trade |
+| 40% | 1:2 | +0,20R | 57 trade |
+| **40%** | **1:3** | **+0,60R** | **19 trade** ⭐ |
+| 35% | 1:3 | +0,40R | 28 trade |
+| 30% | 1:3 | +0,20R | 61 trade |
 
-Angka "~5 trade menang" di Tabel bagian 2 adalah kalau **tidak ada loss sama sekali** di
-antaranya. Di dunia nyata, dengan loss yang berselang-seling, jawabannya **18–31 trade**.
+Angka "6 trade menang" di Tabel bagian 2 adalah kalau **tidak ada loss sama sekali** di
+antaranya. Di dunia nyata, dengan loss yang berselang-seling, jawabannya **19–31 trade**.
 Dengan 2–3 trade per hari, itu **2–3 minggu kerja**. Itu timeline yang jujur.
 
 **Perhatikan baris berbintang:** RR 1:3 dengan winrate 40% memulihkan lebih cepat
-(18 trade) daripada RR 1:2 dengan winrate 50% (21 trade). Kalau Anda ingin mempercepat
+(19 trade) daripada RR 1:2 dengan winrate 50% (22 trade). Kalau Anda ingin mempercepat
 pemulihan, **naikkan RR (perpanjang TP), jangan naikkan lot.** Itu satu-satunya akselerator
 yang tidak menambah risiko kebangkrutan.
 
@@ -384,12 +384,12 @@ pelanggaran aturan. Kalau pelanggaran > 0, itu masalah nomor satu Anda — bukan
 | Batas rugi mingguan | −5% |
 | Stop total | DD −10% dari puncak equity |
 | Target bulanan | 3–6% |
-| Waktu pemulihan realistis | 18–31 trade (2–3 minggu) |
+| Waktu pemulihan realistis | 19–31 trade (2–3 minggu) |
 
 ### Tiga kalimat yang perlu diingat
 
-1. **Memperbesar lot tidak mempercepat pemulihan** — ~5 trade menang dibutuhkan di risk
-   1% maupun 10%; yang berbeda hanya seberapa hancur akunnya.
+1. **Memperbesar lot tidak mempercepat pemulihan** — 6 trade menang di RR 1:2 dibutuhkan
+   baik di risk 1% maupun 10%; yang berbeda hanya seberapa hancur akunnya.
 2. **Yang mempercepat pemulihan adalah RR yang lebih besar**, bukan lot yang lebih besar —
    panjangkan TP, jangan pendekkan SL.
 3. **10 loss beruntun bukan alasan untuk mengubah money management** — itu justru bukti
