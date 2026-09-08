@@ -1,0 +1,82 @@
+name: Deploy Dasbor XAU ke VPS
+
+# Kirim dashboard/ ke VPS lewat rsync/SSH setiap ada perubahan.
+# Butuh 3 secret wajib di Settings -> Secrets and variables -> Actions:
+#   VPS_HOST, VPS_USER, VPS_SSH_KEY
+# Opsional: VPS_PATH (default /var/www/xau), VPS_PORT (default 22),
+#           VPS_KNOWN_HOSTS (isi baris known_hosts; kalau kosong dipakai ssh-keyscan)
+on:
+  push:
+    branches:
+      - main
+      - claude/xau-fokus-o6pzbx
+    paths:
+      - "dashboard/**"
+      - ".github/workflows/deploy-dashboard.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-dasbor
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Cek secret wajib
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          missing=""
+          [ -z "$VPS_HOST" ] && missing="$missing VPS_HOST"
+          [ -z "$VPS_USER" ] && missing="$missing VPS_USER"
+          [ -z "$VPS_SSH_KEY" ] && missing="$missing VPS_SSH_KEY"
+          if [ -n "$missing" ]; then
+            echo "Secret belum diisi:$missing"
+            echo "Tambahkan di Settings -> Secrets and variables -> Actions, lalu jalankan ulang."
+            exit 1
+          fi
+
+      - name: Siapkan kunci SSH
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          if [ -n "$VPS_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$VPS_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::VPS_KNOWN_HOSTS kosong — memakai ssh-keyscan (trust on first use)."
+            ssh-keyscan -p "${VPS_PORT:-22}" -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Kirim dashboard/ ke VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+          VPS_PORT: ${{ secrets.VPS_PORT }}
+        run: |
+          target="${VPS_PATH:-/var/www/xau}"
+          echo "Deploy ke $VPS_USER@$VPS_HOST:$target"
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/id_deploy -p ${VPS_PORT:-22} -o StrictHostKeyChecking=yes" \
+            dashboard/ "$VPS_USER@$VPS_HOST:$target/"
+
+      - name: Ringkasan
+        env:
+          VPS_PATH: ${{ secrets.VPS_PATH }}
+        run: |
+          echo "Dasbor terkirim ke ${VPS_PATH:-/var/www/xau}/xau-pipeline.html" >> $GITHUB_STEP_SUMMARY
+          echo "Pastikan blok nginx sudah menunjuk ke folder itu (lihat deploy/nginx-xau.conf)." >> $GITHUB_STEP_SUMMARY
