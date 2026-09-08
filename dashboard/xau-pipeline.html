@@ -265,6 +265,48 @@ td.sell{color:var(--fail)}
 .hr.blk span{color:var(--fail)}
 .hkey{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
 .hkey b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+/* penyaring RR 1:1 */
+.filters{display:flex;flex-wrap:wrap;gap:18px;padding:12px}
+.fl{display:flex;flex-direction:column;gap:6px;min-width:150px}
+.fl.grow{flex:1 1 190px;justify-content:flex-start}
+.fl > span{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:6px}
+.fl > span i{font-style:normal;color:var(--gold)}
+.seg{display:flex;gap:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;width:max-content}
+.seg button{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:6px 10px;cursor:pointer;
+  background:var(--panel);border:0;border-right:1px solid var(--line);color:var(--ink-3);
+}
+.seg button:last-child{border-right:0}
+.seg button:hover{color:var(--ink-2);background:var(--panel-2)}
+.seg button.on{background:var(--panel-3);color:var(--gold)}
+.seg button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.chart-hold{position:relative}
+#scatter{width:100%;height:auto;display:block}
+.tip[hidden]{display:none}
+.tip{
+  position:absolute;pointer-events:none;background:var(--panel-3);border:1px solid var(--line);
+  border-radius:3px;padding:8px 10px;min-width:170px;box-shadow:0 6px 20px rgba(0,0,0,.5);
+  font-family:var(--mono);font-size:10px;display:grid;grid-template-columns:auto auto;gap:2px 12px;z-index:5;
+}
+.tip b{grid-column:1/-1;color:var(--ink);font-weight:500;margin-bottom:3px}
+.tip i{font-style:normal;color:var(--ink-3)}
+.tip em{font-style:normal;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.chart-note{margin:12px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.5;max-width:70ch}
+.chart-note strong{color:var(--ink)}
+.hero{padding:12px 12px 10px;border-bottom:1px solid var(--line-soft)}
+.hero-name{font-family:var(--mono);font-size:15px;color:var(--gold);word-break:break-all}
+.hero-sub{margin-top:4px;font-size:11.5px;color:var(--ink-2);line-height:1.45}
+.kpi.kpi-4{grid-template-columns:repeat(2,1fr)}
+.kpi.kpi-4 div:nth-child(-n+2){border-bottom:1px solid var(--line-soft)}
+.vd{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:2px 6px;border-radius:2px}
+.vd.ok{background:var(--ok-bg);color:var(--ok)}
+.vd.warn{background:var(--warn-bg);color:var(--warn)}
+.vd.fail{background:var(--fail-bg);color:var(--fail)}
+.vd.none{background:var(--panel-3);color:var(--ink-3)}
+table.scr{font-size:10.5px}
+table.scr td{white-space:nowrap}
+table.scr tr:hover td{background:var(--panel-2)}
+.fx{font-family:var(--mono);font-size:11px;color:var(--gold)}
 .foot{
   margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
   font-family:var(--mono);font-size:10px;color:var(--ink-3);
@@ -284,7 +326,7 @@ td.sell{color:var(--fail)}
     <nav class="tabs" role="tablist" aria-label="Tampilan">
       <button class="tab" role="tab" id="tab-pipeline" aria-controls="pane-pipeline" aria-selected="true">Pipeline</button>
       <button class="tab" role="tab" id="tab-vol" aria-controls="pane-vol" aria-selected="false">Volatilitas</button>
-      <button class="tab" role="tab" id="tab-sinyal" aria-controls="pane-sinyal" aria-selected="false">Sinyal</button>
+      <button class="tab" role="tab" id="tab-sinyal" aria-controls="pane-sinyal" aria-selected="false">Pencari 1:1</button>
     </nav>
     <div class="top-stats">
       <span class="sim">DATA SIMULASI</span>
@@ -392,9 +434,9 @@ td.sell{color:var(--fail)}
           <div class="barlist" id="sess"></div>
           <div class="axis"><span>0</span><span>$12</span><span>$24</span><span>$36</span></div>
           <p style="margin:14px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.5">
-            Mart <span style="font-family:var(--mono);color:var(--gold)">xau_session_profile</span> memberi tahu penjadwal
-            kapan sinyal M5 boleh hidup. Sesi Asia terlalu sempit untuk TP 8 point — 80 pip butuh rentang yang
-            baru muncul saat London buka.
+            Untuk RR 1:1 pembacaannya terbalik dari strategi tren: sesi sempit justru <strong style="color:var(--ink)">ramah</strong>,
+            karena target sekecil stop lebih sering tersentuh saat harga bolak-balik. Rentang Asia $9,40 cukup untuk
+            setup fade dengan stop $3. Yang menghukumnya bukan sesi, tapi biaya — lihat kolom impas di tab Pencari 1:1.
           </p>
         </div>
       </div>
@@ -407,9 +449,10 @@ td.sell{color:var(--fail)}
           <div><span>Rezim</span><b style="color:var(--warn)">EKSPANSI</b></div>
         </div>
         <p class="note">
-          Rezim ekspansi memperlebar SL minimum: pada ATR $4,72 stop 4 point (40 pip) hanya 0,85× ATR —
-          <strong style="color:var(--ink)">terlalu rapat</strong>. Gate <span style="font-family:var(--mono);color:var(--gold)">xau_atr_regime</span>
-          menolak setup RR 1:2 sampai stop ≥ 1,2× ATR atau ATR turun ke bawah $4,00.
+          Rezim ekspansi adalah musuh utama setup RR 1:1 mean-reversion: harga yang sedang tren melewati target
+          <em>dan</em> stop dengan mudah, dan winrate historisnya turun ~5 poin. Gerbang
+          <span style="font-family:var(--mono);color:var(--gold)">xau_atr_regime</span> mematikan setup fade saat ATR
+          di atas $4,00, dan menyerahkan giliran ke setup kontinuasi yang justru membaik di rezim ini.
         </p>
       </div>
     </div>
@@ -423,45 +466,143 @@ td.sell{color:var(--fail)}
           <span><b style="background:var(--fail-bg);box-shadow:inset 0 0 0 1px var(--fail)"></b>Diblokir xau_news_risk — jendela CPI AS 20:30</span>
         </div>
         <p style="margin:14px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.5;max-width:78ch">
-          Jam 20 tetap tertutup meski overlap NY adalah sesi paling lebar: gerbang berita menang atas gerbang
-          sesi. Urutannya selalu sama — sesi, lalu ATR, lalu berita, lalu pagu risiko — dan sinyal harus lolos
-          keempatnya sebelum jadi order.
+          Jam 20 tetap tertutup meski overlap NY adalah sesi paling lebar: gerbang berita menang atas gerbang sesi.
+          Di RR 1:1 aturan ini paling mahal untuk dilanggar — winrate setup mean-reversion turun 7,5 poin di dalam
+          jendela berita, cukup untuk menjatuhkannya ke bawah ambang impas. Urutannya selalu sama: sesi, ATR,
+          berita, lalu gerbang biaya.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ══ SINYAL ════════════════════════════════════════════════════════════ -->
+  <!-- ══ PENCARI 1:1 ═══════════════════════════════════════════════════════ -->
   <section class="pane" id="pane-sinyal" role="tabpanel" aria-labelledby="tab-sinyal" hidden>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Penyaring setup <em style="font-style:normal;color:var(--ink-3)">semua angka dihitung ulang dari 4.000 trade tersimulasi (±3 tahun)</em></h3>
+      <div class="filters">
+        <div class="fl">
+          <span>Sesi</span>
+          <div class="seg" id="f-sesi" role="group" aria-label="Filter sesi">
+            <button class="on" data-v="all">Semua</button><button data-v="Asia">Asia</button><button data-v="London">London</button><button data-v="Overlap NY">Overlap</button><button data-v="NY sore">NY sore</button>
+          </div>
+        </div>
+        <div class="fl">
+          <span>Rezim ATR</span>
+          <div class="seg" id="f-rezim" role="group" aria-label="Filter rezim ATR">
+            <button class="on" data-v="all">Semua</button><button data-v="kontraksi">Kontraksi</button><button data-v="normal">Normal</button><button data-v="ekspansi">Ekspansi</button>
+          </div>
+        </div>
+        <div class="fl">
+          <span>Jendela berita</span>
+          <div class="seg" id="f-berita" role="group" aria-label="Filter jendela berita">
+            <button class="on" data-v="excl">Dikecualikan</button><button data-v="all">Disertakan</button>
+          </div>
+        </div>
+        <div class="fl grow">
+          <span>Biaya per trade (spread + komisi) <i id="v-cost">$0,38</i></span>
+          <input type="range" id="f-cost" min="0.15" max="0.75" step="0.01" value="0.38">
+        </div>
+        <div class="fl grow">
+          <span>Sampel minimum <i id="v-min">120 trade</i></span>
+          <input type="range" id="f-min" min="30" max="300" step="10" value="120">
+        </div>
+      </div>
+    </div>
+
     <div class="two">
       <div class="card">
-        <h3>Mart sinyal <em style="font-style:normal;color:var(--ink-3)">sinyal_xau_m5 + sinyal_xau_h4</em></h3>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Waktu</th><th>Sesi</th><th>Arah</th><th>Setup</th><th class="num">Entry</th><th class="num">SL</th><th class="num">TP</th><th class="num">RR</th><th class="num">Risiko</th><th>Hasil</th></tr></thead>
-            <tbody id="sig-body"></tbody>
-          </table>
+        <h3>Winrate vs ambang impas <em style="font-style:normal;color:var(--ink-3)">RR 1:1</em></h3>
+        <div class="pad">
+          <div class="chart-hold">
+            <svg id="scatter" viewBox="0 0 560 310" role="img"
+                 aria-label="Sebar setup: sumbu X jarak stop dalam dolar, sumbu Y winrate. Garis melengkung adalah winrate impas setelah biaya; setup di atas garis punya ekspektansi positif."></svg>
+            <div class="tip" id="tip" hidden></div>
+          </div>
+          <p class="chart-note">
+            Garis emas adalah winrate yang <strong>wajib</strong> dicapai supaya impas setelah biaya. Stop makin sempit,
+            garisnya makin tinggi — di RR 1:1 biaya menggerogoti persentase yang sama dari kemenangan dan kekalahan,
+            jadi scalping stop $2 menuntut winrate 59% hanya untuk balik modal. Titik adalah winrate terukur;
+            batang di bawahnya turun sampai batas bawah 95% — kalau batang menembus garis emas, edge-nya belum
+            terbukti.
+          </p>
         </div>
-        <div class="tbl-note">Semua angka simulasi. Risiko dihitung ulang tiap sinyal oleh mart risiko_eksposur, bukan diisi manual.</div>
+      </div>
+
+      <div class="card">
+        <h3>Kandidat terkuat <em style="font-style:normal;color:var(--ink-3)" id="best-n"></em></h3>
+        <div class="hero">
+          <div class="hero-name" id="best-name">—</div>
+          <div class="hero-sub" id="best-sub">—</div>
+        </div>
+        <div class="kpi kpi-4">
+          <div><span>Winrate</span><b id="best-wr">—</b></div>
+          <div><span>Batas bawah 95%</span><b id="best-lo">—</b></div>
+          <div><span>Impas di biaya ini</span><b id="best-be">—</b></div>
+          <div><span>Ekspektansi</span><b id="best-e">—</b></div>
+        </div>
+        <div class="state-note" id="best-note"></div>
+        <div class="kpi">
+          <div><span>Trade/minggu</span><b id="best-freq">—</b></div>
+          <div><span>Kalah beruntun max</span><b id="best-streak">—</b></div>
+          <div><span>Hasil mingguan @1%</span><b id="best-week">—</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>Semua setup <em style="font-style:normal;color:var(--ink-3)">urut dari edge terbesar</em></h3>
+      <div class="tbl-wrap">
+        <table class="scr">
+          <thead><tr>
+            <th>Setup</th><th>Sesi utama</th><th>Tipe</th><th class="num">Stop</th><th class="num">N</th>
+            <th class="num">Winrate</th><th class="num">95% bawah</th><th class="num">Impas</th>
+            <th class="num">Edge</th><th class="num">E per trade</th><th class="num">Kalah beruntun</th><th>Putusan</th>
+          </tr></thead>
+          <tbody id="scr-body"></tbody>
+        </table>
+      </div>
+      <div class="tbl-note" id="scr-note"></div>
+    </div>
+
+    <div class="two" style="margin-top:0">
+      <div class="card">
+        <h3>Aritmetika RR 1:1</h3>
+        <div class="note" style="border-top:0">
+          <p style="margin:0 0 10px">
+            RR 1:1 bukan versi mudah dari RR 1:2 — yang berubah cuma ambangnya. Di RR 1:2 Anda cukup menang
+            <strong>36%</strong>; di RR 1:1 Anda harus menang <strong>lebih dari 50% ditambah biaya</strong>.
+          </p>
+          <p style="margin:0 0 10px">
+            Rumusnya: <span class="fx">winrate impas = (stop + biaya) ÷ (2 × stop)</span>. Dengan stop $4,00 dan
+            biaya $0,38, ambangnya <strong>54,8%</strong>. Dengan stop $8,00, ambangnya turun ke <strong>52,4%</strong>
+            — sebab yang menyakitkan bukan RR-nya, tapi biaya sebagai persentase dari R.
+          </p>
+          <p style="margin:0">
+            Konsekuensinya untuk pencarian sinyal: <strong>jangan cari winrate tinggi lewat stop sempit.</strong>
+            Stop sempit menaikkan winrate yang dibutuhkan lebih cepat daripada menaikkan winrate yang didapat.
+          </p>
+        </div>
       </div>
       <div class="card">
-        <h3>Penjaga risiko — tangga de-risking</h3>
-        <div class="ladder">
-          <div class="lrow"><p><b>Normal — equity di puncak</b>Mode standar, ukuran penuh.</p><span class="rk">1,00%</span></div>
-          <div class="lrow active"><p><b>Setelah 2 loss beruntun</b>Pasar mungkin tidak cocok dengan sistem.</p><span class="rk">0,75%</span></div>
-          <div class="lrow"><p><b>Setelah 3 loss beruntun</b>Perlambat kerusakan, cari konfirmasi.</p><span class="rk">0,50%</span></div>
-          <div class="lrow stop"><p><b>Setelah 4 loss beruntun</b>Berhenti hari itu — ini kondisi pasar/emosi.</p><span class="rk">STOP</span></div>
+        <h3>Kapan sebuah winrate boleh dipercaya</h3>
+        <div class="note" style="border-top:0">
+          <p style="margin:0 0 10px">
+            Winrate 65% dari 30 trade punya batas bawah 95% di sekitar <strong>47%</strong> — belum bisa dibedakan
+            dari lempar koin. Kolom <strong>95% bawah</strong> adalah angka yang boleh dipakai mengambil keputusan;
+            kolom winrate hanya rangkuman masa lalu.
+          </p>
+          <p style="margin:0 0 10px">
+            Karena itu putusan <span class="vd ok">LOLOS</span> di tabel butuh dua hal sekaligus: batas bawah 95%
+            masih di atas ambang impas, <em>dan</em> sampel mencapai minimum. Setup yang winrate-nya tinggi tapi
+            sampelnya tipis diberi <span class="vd warn">TIPIS</span> — layak dilanjutkan, belum layak dinaikkan lot.
+          </p>
+          <p style="margin:0">
+            Pagu risiko tidak berubah: <strong>1% per trade</strong>, turun ke 0,75% setelah 2 loss beruntun dan
+            0,50% setelah 3 — persis tangga di <span class="fx">docs/xauusd-trading-plan.md</span>. Di RR 1:1 satu
+            kemenangan hanya mengganti satu kekalahan, jadi disiplin ukuran lot justru lebih menentukan, bukan kurang.
+          </p>
         </div>
-        <div class="kpi">
-          <div><span>Loss beruntun</span><b id="s-streak" style="color:var(--warn)">2</b></div>
-          <div><span>Risiko aktif</span><b style="color:var(--gold)" id="s-risk">0,75%</b></div>
-          <div><span>DD dari puncak</span><b id="s-dd">−2,4%</b></div>
-        </div>
-        <p class="note">
-          Agen tidak boleh menaikkan lot setelah kalah. Kembali ke 1% hanya setelah equity menyentuh lagi
-          high-water mark — bukan setelah menang sekali. Aturan ini hidup di kode mart, jadi sinyal yang
-          melanggarnya tidak pernah sampai ke eksekusi.
-        </p>
       </div>
     </div>
   </section>
@@ -477,7 +618,7 @@ td.sell{color:var(--fail)}
 "use strict";
 var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 var COLX = [4,176,348,520,692];
-var Y6=[40,125,210,295,380,465], Y5=[98,183,268,353,438], Y4=[140,225,310,395];
+var Y6=[40,125,210,295,380,465], Y5=[98,183,268,353,438];
 
 var NODES = [
  {id:"s1",n:"xau_spot_feed",     l:0,y:Y6[0],r:4120,s:"tick", d:"Tick bid/ask XAUUSD dari empat likuiditas provider, di-stempel waktu di sisi kami."},
@@ -505,10 +646,11 @@ var NODES = [
  {id:"g4",n:"xau_signal_features",l:3,y:Y5[3],r:128,s:"sig",  f:["t1","t2"],d:"Tabel fitur yang dibaca model: struktur, momentum, likuiditas, jarak ke level."},
  {id:"g5",n:"xau_news_risk",     l:3,y:Y5[4],r:9,   s:"event",f:["t4"],     d:"Skor risiko berita per menit. Di atas ambang, entry baru diblokir."},
 
- {id:"m1",n:"sinyal_xau_m5",     l:4,y:Y4[0],r:34,  s:"sig",  f:["g1","g2","g4","g5"],d:"Sinyal intraday M5. Tiap kandidat wajib lolos gerbang ATR, sesi, dan risiko berita."},
- {id:"m2",n:"sinyal_xau_h4",     l:4,y:Y4[1],r:11,  s:"sig",  f:["g1","g3","g4"],     d:"Sinyal swing H4, condong ke arah makro: dolar melemah dan yield riil turun."},
- {id:"m3",n:"risiko_eksposur",   l:4,y:Y4[2],r:18,  s:"sig",  f:["g1","g5"],          d:"Ukuran lot dihitung dari jarak stop dan pagu risiko 1% — bukan diisi manual."},
- {id:"m4",n:"kualitas_eksekusi", l:4,y:Y4[3],r:24,  s:"exec", f:["t2"],               d:"Tiap fill dinilai terhadap best bid/ask saat order dikirim. Slippage diukur, bukan diasumsikan."}
+ {id:"m1",n:"sinyal_xau_1_1",    l:4,y:Y5[0],r:34,  s:"sig",  f:["g1","g2","g4","g5"],d:"Sinyal RR 1:1 — target sama besar dengan stop. Kandidat hanya lolos jika winrate historisnya di atas ambang impas setelah biaya."},
+ {id:"m2",n:"backtest_winrate",  l:4,y:Y5[1],r:19,  s:"sig",  f:["g4","t1"],          d:"Menghitung ulang winrate tiap setup per sesi dan rezim ATR, lengkap dengan batas bawah 95% supaya sampel tipis tidak menipu."},
+ {id:"m3",n:"gerbang_biaya",     l:4,y:Y5[2],r:26,  s:"sig",  f:["g1"],               d:"Ambang impas = (stop + biaya) / (2 x stop). Setup dengan stop terlalu sempit ditolak di sini, bukan di akun."},
+ {id:"m4",n:"risiko_eksposur",   l:4,y:Y5[3],r:18,  s:"sig",  f:["g1","g5"],          d:"Ukuran lot dihitung dari jarak stop dan pagu risiko 1% — bukan diisi manual."},
+ {id:"m5",n:"kualitas_eksekusi", l:4,y:Y5[4],r:24,  s:"exec", f:["t2"],               d:"Tiap fill dinilai terhadap best bid/ask saat order dikirim. Slippage yang diukur di sini masuk ke gerbang biaya."}
 ];
 var LAYERS=["Sources","Bronze","Silver","Gold","Marts"];
 var byId={}; NODES.forEach(function(n){ n.state="ok"; n.lag=0.6+Math.random()*0.9; n.seen=8000+Math.random()*90000; byId[n.id]=n; });
@@ -614,8 +756,10 @@ function say(kind,who,msg,off){
 var ROUTINE=[
   ["ok","xau_ohlcv_m1",function(){return id2(1200+Math.floor(Math.random()*600))+" baris dipadatkan — "+(2+Math.floor(Math.random()*7))+" tick duplikat dibuang";}],
   ["info","xau_spread_quality",function(){return "spread median "+dec(0.22+Math.random()*0.12,2)+" · "+(1+Math.floor(Math.random()*5))+" outlier dikarantina";}],
-  ["info","sinyal_xau_m5",function(){return "1 kandidat ditolak — gerbang ATR: stop < 1,2x ATR";}],
+  ["info","sinyal_xau_1_1",function(){return "1 kandidat ditolak — gerbang ATR: stop < 1,2x ATR";}],
   ["ok","risiko_eksposur",function(){return "eksposur "+dec(0.6+Math.random()*0.35,2)+"% equity, di bawah pagu 1,00%";}],
+  ["info","gerbang_biaya",function(){return "ambang impas 54,8% pada stop $4,00 — 1 kandidat RR 1:1 ditolak, winrate 51,2%";}],
+  ["ok","backtest_winrate",function(){return "winrate fade_batas_range_asia "+dec(62+Math.random()*3,1)+"% dari "+id2(180+Math.floor(Math.random()*40))+" trade";}],
   ["info","kualitas_eksekusi",function(){return "slippage p95 "+dec(0.22+Math.random()*0.18,2)+" point pada "+(6+Math.floor(Math.random()*20))+" fill";}],
   ["info","jendela_event",function(){return "2 jendela berita terbuka — CPI AS 20:30 WITA";}],
   ["ok","orkestrator",function(){return "heartbeat — watermark maju, semua partisi tertutup";}],
@@ -828,24 +972,217 @@ for(var h=0;h<24;h++){
 }
 document.getElementById("hours").innerHTML=hstr;
 
-/* ── tab sinyal ───────────────────────────────────────────────────────────── */
-var SIG=[
- ["21:12","Overlap NY","SELL","Rejeksi VWAP +2σ","4182,60","4186,60","4174,60","1:2","0,75%","BERJALAN"],
- ["20:35","London","BUY","Break struktur H1","4176,20","4172,20","4184,20","1:2","1,00%","KALAH"],
- ["19:48","London","BUY","Retest supply gagal","4171,90","4167,90","4179,90","1:2","1,00%","KALAH"],
- ["18:05","London","SELL","Sweep likuiditas","4180,40","4184,40","4172,40","1:2","1,00%","MENANG"],
- ["16:20","London","SELL","Break struktur H1","4188,10","4184,10","4180,10","1:2","1,00%","MENANG"],
- ["14:40","Pra-London","BUY","Rejeksi VWAP +2σ","—","—","—","—","—","DITOLAK · sesi"],
- ["11:15","Asia","BUY","Sweep likuiditas","—","—","—","—","—","DITOLAK · ATR"],
- ["09:02","Asia","SELL","Retest supply","4165,30","4161,30","4157,30","1:2","1,00%","MENANG"]
+/* ── pencari sinyal RR 1:1 ────────────────────────────────────────────────── */
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0;
+  var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
+  return ((t^t>>>14)>>>0)/4294967296; }; }
+
+var SETUPS=[
+ {id:"fade_asia",  n:"fade_batas_range_asia", tipe:"mean-reversion", sesi:"Asia",       stop:3.0, base:.645, frek:3.1,
+  d:"Jual di batas atas range Asia, beli di batas bawah, keluar di tengah range."},
+ {id:"vwap_2sd",   n:"rejeksi_vwap_2sd",      tipe:"mean-reversion", sesi:"London",     stop:4.5, base:.618, frek:4.6,
+  d:"Harga menembus 2 sigma VWAP lalu ditolak; entry saat kembali ke dalam pita."},
+ {id:"sweep_h1",   n:"sweep_likuiditas_h1",   tipe:"mean-reversion", sesi:"London",     stop:5.5, base:.604, frek:2.8,
+  d:"Sapu high/low H1 lalu reclaim dalam 3 candle M5."},
+ {id:"pullback20", n:"pullback_ema20_m5",     tipe:"kontinuasi",     sesi:"Overlap NY", stop:5.0, base:.552, frek:5.4,
+  d:"Pullback ke EMA20 searah tren M15 yang sudah jalan."},
+ {id:"retest_lo",  n:"retest_london_open",    tipe:"kontinuasi",     sesi:"London",     stop:6.0, base:.531, frek:1.9,
+  d:"Retest level pembukaan London setelah break pertama."},
+ {id:"fade_news",  n:"fade_spike_berita",     tipe:"mean-reversion", sesi:"Overlap NY", stop:8.0, base:.508, frek:1.2,
+  d:"Lawan spike menit pertama rilis data. Variansnya paling besar."},
+ {id:"brk_ny",     n:"breakout_overlap_ny",   tipe:"kontinuasi",     sesi:"Overlap NY", stop:7.0, base:.462, frek:3.3,
+  d:"Breakout rentang pra-NY. Cocok untuk RR 1:2, bukan untuk 1:1."}
 ];
-document.getElementById("sig-body").innerHTML=SIG.map(function(r){
-  var warna=r[9]==="MENANG"?"var(--ok)":r[9]==="KALAH"?"var(--fail)":r[9]==="BERJALAN"?"var(--gold)":"var(--ink-3)";
-  return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td>"+
-    '<td class="'+(r[2]==="BUY"?"buy":"sell")+'">'+r[2]+"</td><td>"+r[3]+"</td>"+
-    '<td class="num">'+r[4]+'</td><td class="num">'+r[5]+'</td><td class="num">'+r[6]+'</td>'+
-    '<td class="num">'+r[7]+'</td><td class="num">'+r[8]+'</td>'+
-    '<td style="color:'+warna+'">'+r[9]+"</td></tr>";
-}).join("");
+var SESI_LIST=["Asia","London","Overlap NY","NY sore"], REZIM_LIST=["kontraksi","normal","ekspansi"];
+var REZIM_ADJ={ "mean-reversion":{kontraksi:.045,normal:.005,ekspansi:-.055},
+                "kontinuasi":{kontraksi:-.05,normal:.01,ekspansi:.045} };
+
+var TRADES=(function(){
+  var r=rng(20260908), out=[];
+  for(var i=0;i<4000;i++){
+    var st=SETUPS[Math.floor(r()*SETUPS.length)];
+    var sesi = r()<.62 ? st.sesi : SESI_LIST[Math.floor(r()*4)];
+    var rezim = REZIM_LIST[r()<.34?0:(r()<.62?1:2)];
+    var berita = r()<.14;
+    var p = st.base + REZIM_ADJ[st.tipe][rezim] + (berita?-.075:.012) + (sesi===st.sesi?.022:-.038);
+    p = Math.max(.32, Math.min(.74, p));
+    out.push({s:st.id, sesi:sesi, rezim:rezim, berita:berita, menang:r()<p});
+  }
+  return out;
+})();
+
+function wilsonLo(w,n){
+  if(!n) return 0;
+  var z=1.96, p=w/n, d=1+z*z/n;
+  var c=p+z*z/(2*n), m=z*Math.sqrt(p*(1-p)/n + z*z/(4*n*n));
+  return Math.max(0,(c-m)/d);
+}
+var F={sesi:"all", rezim:"all", berita:"excl", cost:0.38, min:120};
+
+function agg(){
+  var by={}; SETUPS.forEach(function(s){ by[s.id]={w:0,n:0,streak:0,cur:0}; });
+  TRADES.forEach(function(t){
+    if(F.sesi!=="all" && t.sesi!==F.sesi) return;
+    if(F.rezim!=="all" && t.rezim!==F.rezim) return;
+    if(F.berita==="excl" && t.berita) return;
+    var a=by[t.s]; a.n++;
+    if(t.menang){ a.w++; a.cur=0; } else { a.cur++; if(a.cur>a.streak) a.streak=a.cur; }
+  });
+  return SETUPS.map(function(s){
+    var a=by[s.id], p=a.n?a.w/a.n:0, be=(s.stop+F.cost)/(2*s.stop), lo=wilsonLo(a.w,a.n);
+    var cr=F.cost/s.stop, e=p*(1-cr)-(1-p)*(1+cr);
+    var putusan = a.n<20 ? "sampel nihil" : (lo>be && a.n>=F.min ? "LOLOS" : (p>be ? "TIPIS" : "TOLAK"));
+    return {s:s, n:a.n, wr:p, lo:lo, be:be, edge:p-be, e:e, streak:a.streak, putusan:putusan};
+  }).sort(function(x,y){
+    var rx=x.n<20?-9:(x.lo-x.be), ry=y.n<20?-9:(y.lo-y.be);
+    return ry-rx;
+  });
+}
+
+var VD={LOLOS:"ok","TIPIS":"warn","TOLAK":"fail","sampel nihil":"none"};
+function pct(v,d){ return dec(v*100,d===undefined?1:d)+"%"; }
+
+function renderScreener(){
+  var rows=agg(), pass=rows.filter(function(r){ return r.putusan==="LOLOS"; });
+
+  document.getElementById("scr-body").innerHTML=rows.map(function(r){
+    var v=VD[r.putusan];
+    return '<tr data-id="'+r.s.id+'">'+
+      '<td style="color:var(--ink)">'+r.s.n+'</td><td>'+r.s.sesi+'</td><td>'+r.s.tipe+'</td>'+
+      '<td class="num">$'+dec(r.s.stop,2)+'</td><td class="num">'+id2(r.n)+'</td>'+
+      '<td class="num" style="color:var(--ink)">'+pct(r.wr)+'</td>'+
+      '<td class="num">'+pct(r.lo)+'</td><td class="num">'+pct(r.be)+'</td>'+
+      '<td class="num" style="color:'+(r.edge>0?"var(--ok)":"var(--fail)")+'">'+(r.edge>0?"+":"−")+pct(Math.abs(r.edge))+'</td>'+
+      '<td class="num">'+(r.e>0?"+":"−")+dec(Math.abs(r.e),3)+'R</td>'+
+      '<td class="num">'+r.streak+'</td>'+
+      '<td><span class="vd '+v+'">'+r.putusan+'</span></td></tr>';
+  }).join("");
+
+  var freqTot=pass.reduce(function(a,r){ return a+r.s.frek; },0);
+  var eTot=pass.reduce(function(a,r){ return a+r.e*r.s.frek; },0);
+  document.getElementById("scr-note").innerHTML= pass.length
+    ? pass.length+" setup lolos filter ini — gabungan "+dec(freqTot,1)+" trade/minggu, ekspektansi "+
+      (eTot>0?"+":"")+dec(eTot,2)+"R atau "+(eTot>0?"+":"")+dec(eTot,2)+"% equity per minggu pada risiko 1%."
+    : "Tidak ada setup yang lolos di filter ini. Longgarkan sampel minimum atau turunkan biaya sebelum menaikkan lot.";
+
+  var best=rows[0];
+  document.getElementById("best-name").textContent=best.s.n;
+  document.getElementById("best-sub").textContent=best.s.d;
+  document.getElementById("best-n").textContent=id2(best.n)+" trade cocok filter";
+  document.getElementById("best-wr").textContent=pct(best.wr);
+  document.getElementById("best-lo").textContent=pct(best.lo);
+  document.getElementById("best-be").textContent=pct(best.be);
+  var eEl=document.getElementById("best-e");
+  eEl.textContent=(best.e>0?"+":"−")+dec(Math.abs(best.e),3)+"R";
+  eEl.style.color=best.e>0?"var(--ok)":"var(--fail)";
+  document.getElementById("best-freq").textContent=dec(best.s.frek,1);
+  document.getElementById("best-streak").textContent=best.streak;
+  var wk=best.e*best.s.frek;
+  document.getElementById("best-week").textContent=(wk>0?"+":"−")+dec(Math.abs(wk),2)+"%";
+  var v=VD[best.putusan];
+  document.getElementById("best-note").innerHTML=
+    '<span class="vd '+v+'" style="margin-right:8px">'+best.putusan+'</span>'+
+    (best.putusan==="LOLOS"
+      ? "Batas bawah 95% ("+pct(best.lo)+") masih di atas ambang impas ("+pct(best.be)+") dan sampelnya cukup. Ini setup yang boleh dijalankan penuh di RR 1:1."
+      : best.putusan==="TIPIS"
+        ? "Winrate di atas ambang impas, tapi batas bawah 95% ("+pct(best.lo)+") belum melewatinya — atau sampel di bawah "+F.min+" trade. Jalankan dengan lot minimum sambil menambah sampel."
+        : "Tidak ada kandidat yang melewati ambang impas di filter ini. Jangan paksakan — longgarkan filter atau tunggu kondisi pasar yang cocok.");
+
+  drawScatter(rows);
+}
+
+/* sebar: jarak stop vs winrate, dengan kurva ambang impas */
+var X0=52,X1=530,Y0=20,Y1=252, SX0=2, SX1=12, SY0=.40, SY1=.72;
+function sx(v){ return X0+(X1-X0)*(v-SX0)/(SX1-SX0); }
+function sy(v){ return Y1-(Y1-Y0)*(v-SY0)/(SY1-SY0); }
+function drawScatter(rows){
+  var g='', i;
+  for(var y=.40;y<=.7201;y+=.04){
+    g+='<line x1="'+X0+'" y1="'+sy(y).toFixed(1)+'" x2="'+X1+'" y2="'+sy(y).toFixed(1)+'" stroke="#241E14" stroke-width="1"/>';
+    g+='<text x="'+(X0-8)+'" y="'+(sy(y)+3).toFixed(1)+'" text-anchor="end" fill="#6E6656" font-family="IBM Plex Mono,monospace" font-size="9">'+Math.round(y*100)+'%</text>';
+  }
+  for(i=2;i<=12;i+=2){
+    g+='<text x="'+sx(i).toFixed(1)+'" y="'+(Y1+18)+'" text-anchor="middle" fill="#6E6656" font-family="IBM Plex Mono,monospace" font-size="9">$'+i+'</text>';
+  }
+  g+='<text x="'+((X0+X1)/2).toFixed(0)+'" y="'+(Y1+36)+'" text-anchor="middle" fill="#6E6656" font-family="IBM Plex Mono,monospace" font-size="9">jarak stop (= jarak target, RR 1:1)</text>';
+
+  var curve="", top="";
+  for(i=0;i<=100;i++){
+    var xv=SX0+(SX1-SX0)*i/100, yv=(xv+F.cost)/(2*xv);
+    curve+=(i?"L":"M")+sx(xv).toFixed(1)+","+Math.min(Y1,Math.max(Y0,sy(yv))).toFixed(1);
+  }
+  top=curve+" L"+X1+","+Y0+" L"+X0+","+Y0+" Z";
+  g+='<path d="'+top+'" fill="rgba(79,192,141,.07)" stroke="none"/>';
+  g+='<text x="'+(X1-8)+'" y="'+(Y0+16)+'" text-anchor="end" fill="#4FC08D" font-family="IBM Plex Mono,monospace" font-size="9">zona ekspektansi positif</text>';
+  g+='<path d="'+curve+'" fill="none" stroke="#E3B65C" stroke-width="2" stroke-dasharray="5 3"/>';
+  g+='<text x="'+X1+'" y="'+(sy((10.6+F.cost)/21.2)-9).toFixed(1)+'" text-anchor="end" fill="#E3B65C" font-family="IBM Plex Mono,monospace" font-size="9">winrate impas @ biaya $'+dec(F.cost,2)+'</text>';
+
+  var pts=rows.filter(function(r){ return r.n>=20; }).map(function(r){
+    return {r:r, cx:sx(r.s.stop), cy:sy(Math.max(SY0+.005,Math.min(SY1-.005,r.wr))),
+            col:r.putusan==="LOLOS"?"#4FC08D":r.putusan==="TIPIS"?"#E8A03A":"#DE4C63"};
+  });
+  pts.forEach(function(q){
+    g+='<line x1="'+q.cx.toFixed(1)+'" y1="'+sy(Math.max(SY0,q.r.lo)).toFixed(1)+'" x2="'+q.cx.toFixed(1)+'" y2="'+q.cy.toFixed(1)+'" stroke="'+q.col+'" stroke-width="1.5" opacity=".55"/>';
+    g+='<circle class="dot-'+q.r.s.id+'" cx="'+q.cx.toFixed(1)+'" cy="'+q.cy.toFixed(1)+'" r="6" fill="'+q.col+'" stroke="#15120D" stroke-width="2" data-id="'+q.r.s.id+'" style="cursor:pointer"/>';
+  });
+  var placed=[];
+  pts.slice().sort(function(a,b){ return a.cy-b.cy; }).forEach(function(q){
+    var kanan=q.cx<X1-140, lx=kanan?q.cx+11:q.cx-11, ly=q.cy+3, guard=0;
+    while(guard++<14 && placed.some(function(o){ return Math.abs(o.x-lx)<132 && Math.abs(o.y-ly)<12; })) ly+=13;
+    placed.push({x:lx,y:ly});
+    g+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="'+(kanan?"start":"end")+'" fill="#A79C88" font-family="IBM Plex Mono,monospace" font-size="9">'+q.r.s.n+'</text>';
+  });
+  g+='<line x1="'+X0+'" y1="'+Y1+'" x2="'+X1+'" y2="'+Y1+'" stroke="#2C2517" stroke-width="1"/>';
+  g+='<text x="14" y="'+((Y0+Y1)/2).toFixed(0)+'" transform="rotate(-90 14 '+((Y0+Y1)/2).toFixed(0)+')" text-anchor="middle" fill="#6E6656" font-family="IBM Plex Mono,monospace" font-size="9">winrate</text>';
+  var sc=document.getElementById("scatter");
+  sc.innerHTML=g;
+  var data={}; rows.forEach(function(r){ data[r.s.id]=r; });
+  var tip=document.getElementById("tip");
+  Array.prototype.forEach.call(sc.querySelectorAll("circle"),function(c){
+    c.addEventListener("mouseenter",function(ev){
+      var r=data[c.dataset.id]; if(!r) return;
+      tip.hidden=false;
+      tip.innerHTML='<b>'+r.s.n+'</b>'+
+        '<i>winrate</i><em>'+pct(r.wr)+' ('+id2(r.n)+' trade)</em>'+
+        '<i>95% bawah</i><em>'+pct(r.lo)+'</em>'+
+        '<i>impas</i><em>'+pct(r.be)+'</em>'+
+        '<i>E per trade</i><em>'+(r.e>0?"+":"−")+dec(Math.abs(r.e),3)+'R</em>';
+      var box=sc.getBoundingClientRect(), p=c.getBoundingClientRect();
+      tip.style.left=Math.min(box.width-190, p.left-box.left+14)+"px";
+      tip.style.top=(p.top-box.top-10)+"px";
+    });
+    c.addEventListener("mouseleave",function(){ tip.hidden=true; });
+  });
+  document.getElementById("scr-body") && Array.prototype.forEach.call(document.querySelectorAll("#scr-body tr"),function(tr){
+    tr.addEventListener("mouseenter",function(){
+      var d=sc.querySelector(".dot-"+tr.dataset.id); if(d) d.setAttribute("r","9");
+    });
+    tr.addEventListener("mouseleave",function(){
+      var d=sc.querySelector(".dot-"+tr.dataset.id); if(d) d.setAttribute("r","6");
+    });
+  });
+}
+
+function segWire(id,key){
+  var box=document.getElementById(id);
+  box.addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    Array.prototype.forEach.call(box.children,function(c){ c.classList.toggle("on",c===b); });
+    F[key]=b.dataset.v; renderScreener();
+  });
+}
+segWire("f-sesi","sesi"); segWire("f-rezim","rezim"); segWire("f-berita","berita");
+document.getElementById("f-cost").addEventListener("input",function(e){
+  F.cost=parseFloat(e.target.value);
+  document.getElementById("v-cost").textContent="$"+dec(F.cost,2);
+  renderScreener();
+});
+document.getElementById("f-min").addEventListener("input",function(e){
+  F.min=parseInt(e.target.value,10);
+  document.getElementById("v-min").textContent=F.min+" trade";
+  renderScreener();
+});
+renderScreener();
+
 })();
 </script>
