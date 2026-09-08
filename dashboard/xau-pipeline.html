@@ -1,0 +1,851 @@
+<title>Pipa Data XAU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ── Pipa Data XAU — terminal gelap, satu dunia visual (dicat eksplisit) ───── */
+:root{
+  --bg:#0D0B08; --panel:#15120D; --panel-2:#1B1710; --panel-3:#221D14;
+  --line:#2C2517; --line-soft:#211B12;
+  --ink:#F3ECDD; --ink-2:#A79C88; --ink-3:#6E6656;
+  --gold:#E3B65C; --gold-dim:#8C6F30; --gold-glow:rgba(227,182,92,.16);
+  --ok:#4FC08D; --warn:#E8A03A; --fail:#DE4C63; --heal:#6B9BE0;
+  --ok-bg:rgba(79,192,141,.12); --warn-bg:rgba(232,160,58,.13);
+  --fail-bg:rgba(222,76,99,.14); --heal-bg:rgba(107,155,224,.14);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:13px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1500px;margin:0 auto;padding:0 18px 40px}
+
+/* ── Topbar ───────────────────────────────────────────────────────────────── */
+.top{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:14px 0 12px;border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{
+  font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--ink);
+}
+.brand .tick{
+  font-family:var(--mono);font-size:11px;color:var(--gold);
+  border:1px solid var(--gold-dim);border-radius:3px;padding:2px 6px;letter-spacing:.06em;
+}
+.tabs{display:flex;gap:2px;margin-left:6px}
+.tab{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);background:none;border:0;border-bottom:2px solid transparent;
+  padding:7px 12px;cursor:pointer;
+}
+.tab:hover{color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--gold);border-bottom-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.top-stats{margin-left:auto;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.tstat{display:flex;flex-direction:column;gap:1px}
+.tstat span{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-3);
+  text-transform:uppercase;
+}
+.tstat b{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.live{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ok)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
+.dot.pulse{animation:beat 1.6s ease-in-out infinite}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.35}}
+.sim{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--warn);
+  border:1px dashed rgba(232,160,58,.45);border-radius:3px;padding:3px 7px;
+}
+
+/* ── Grid ─────────────────────────────────────────────────────────────────── */
+.pane[hidden]{display:none}
+.grid{display:grid;grid-template-columns:216px minmax(0,1fr) 300px;gap:12px;padding-top:12px}
+@media (max-width:1180px){.grid{grid-template-columns:200px minmax(0,1fr)}.insp{grid-column:1/-1}}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px}
+.card > h3{
+  margin:0;padding:9px 12px;border-bottom:1px solid var(--line-soft);
+  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between;align-items:center;
+}
+.rail{display:flex;flex-direction:column;gap:12px}
+.rail-body{padding:12px}
+
+/* Kontrol */
+.ctl{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.ctl:last-child{margin-bottom:0}
+.ctl label{
+  display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;
+  letter-spacing:.08em;color:var(--ink-2);text-transform:uppercase;
+}
+.ctl label i{font-style:normal;color:var(--gold);font-variant-numeric:tabular-nums}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:2px;
+  background:var(--panel-3);cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--gold);border:2px solid var(--bg);
+}
+input[type=range]::-moz-range-thumb{
+  width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);
+}
+input[type=range]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px}
+.btn{
+  font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;
+  padding:9px 6px;border-radius:3px;cursor:pointer;background:var(--panel-2);
+  border:1px solid var(--line);color:var(--ink-2);
+}
+.btn:hover{border-color:var(--gold-dim);color:var(--ink)}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.btn.break{color:var(--fail);border-color:rgba(222,76,99,.4)}
+.btn.break:hover{background:var(--fail-bg);color:#F5A5B0}
+.btn.heal{color:var(--ok);border-color:rgba(79,192,141,.35)}
+.btn.heal:hover{background:var(--ok-bg);color:#8FE0BC}
+
+/* Kesehatan */
+.health{display:flex;flex-direction:column}
+.hrow{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 12px;border-bottom:1px solid var(--line-soft);
+}
+.hrow:last-child{border-bottom:0}
+.hrow span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+.hrow b{font-family:var(--mono);font-size:16px;font-weight:500;font-variant-numeric:tabular-nums}
+.mk{width:8px;height:8px;flex:none}
+.mk.ok{background:var(--ok);border-radius:50%}
+.mk.warn{background:var(--warn);border-radius:1px;transform:rotate(45deg)}
+.mk.fail{background:var(--fail);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.mk.heal{background:var(--heal);border-radius:50%;box-shadow:inset 0 0 0 2px var(--panel)}
+.legend{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.legend div{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+
+/* ── Panggung DAG ─────────────────────────────────────────────────────────── */
+.stage-wrap{overflow-x:auto;overflow-y:hidden}
+.stage{position:relative;width:852px;height:552px}
+.colhead{
+  position:absolute;top:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.colhead i{font-style:normal;color:var(--gold-dim);margin-left:6px}
+.edges{position:absolute;inset:0;width:852px;height:552px;pointer-events:none}
+.edge{fill:none;stroke:#382E1D;stroke-width:1.1}
+.edge.flow{stroke:var(--gold-dim);stroke-dasharray:3 9;animation:dash 1.4s linear infinite}
+.edge.dead{stroke:rgba(222,76,99,.5);stroke-dasharray:2 4;animation:none}
+@keyframes dash{to{stroke-dashoffset:-24}}
+.node{
+  position:absolute;width:152px;height:64px;background:var(--panel);
+  border:1px solid var(--line);border-left:2px solid var(--ok);border-radius:3px;
+  padding:7px 9px;cursor:pointer;text-align:left;color:inherit;font:inherit;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.node:hover{border-color:var(--gold-dim);background:var(--panel-2)}
+.node:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.node.sel{background:var(--panel-2);box-shadow:0 0 0 1px var(--gold),0 0 22px var(--gold-glow)}
+.node .nm{
+  font-family:var(--mono);font-size:11px;color:var(--ink);letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.node .st{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--ok)}
+.node .mt{
+  font-family:var(--mono);font-size:9.5px;color:var(--ink-3);display:flex;gap:8px;
+  font-variant-numeric:tabular-nums;
+}
+.node[data-state=degraded]{border-left-color:var(--warn)}
+.node[data-state=degraded] .st{color:var(--warn)}
+.node[data-state=failing]{border-left-color:var(--fail);background:rgba(222,76,99,.06)}
+.node[data-state=failing] .st{color:var(--fail)}
+.node[data-state=backfill]{border-left-color:var(--heal)}
+.node[data-state=backfill] .st{color:var(--heal)}
+.node .bar{height:2px;background:var(--panel-3);border-radius:1px;overflow:hidden}
+.node .bar i{display:block;height:100%;background:var(--gold-dim);width:40%}
+.node[data-state=failing] .bar i{background:var(--fail)}
+.node[data-state=backfill] .bar i{background:var(--heal)}
+.node[data-state=degraded] .bar i{background:var(--warn)}
+
+/* ── Log orkestrator ──────────────────────────────────────────────────────── */
+.log{height:168px;overflow-y:auto;padding:8px 12px;font-family:var(--mono);font-size:11px}
+.log p{margin:0 0 3px;display:flex;gap:10px;color:var(--ink-3);white-space:nowrap}
+.log p time{color:var(--ink-3);opacity:.75;font-variant-numeric:tabular-nums;flex:none}
+.log p em{font-style:normal;color:var(--ink-2);flex:none;width:150px;overflow:hidden;text-overflow:ellipsis}
+.log p b{font-weight:400;white-space:normal}
+.log p.ok b{color:var(--ok)}
+.log p.warn b{color:var(--warn)}
+.log p.fail b{color:var(--fail)}
+.log p.heal b{color:var(--heal)}
+.log p.info b{color:var(--ink-3)}
+
+/* ── Inspektur ────────────────────────────────────────────────────────────── */
+.insp{display:flex;flex-direction:column;gap:12px;min-width:0}
+.insp-head{padding:11px 12px;border-bottom:1px solid var(--line-soft)}
+.insp-head .lay{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--gold-dim);text-transform:uppercase}
+.insp-head h4{margin:3px 0 5px;font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:-.01em;word-break:break-all}
+.insp-head p{margin:0;font-size:11.5px;color:var(--ink-2);line-height:1.45}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.12em;padding:3px 7px;border-radius:2px;margin-top:8px;
+}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.degraded{background:var(--warn-bg);color:var(--warn)}
+.chip.failing{background:var(--fail-bg);color:var(--fail)}
+.chip.backfill{background:var(--heal-bg);color:var(--heal)}
+.mtr{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line-soft)}
+.mtr div{padding:9px 10px;border-right:1px solid var(--line-soft)}
+.mtr div:last-child{border-right:0}
+.mtr span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase}
+.mtr b{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink)}
+.mtr b small{font-size:9.5px;color:var(--ink-3);font-weight:400}
+.state-note{padding:10px 12px;font-size:11.5px;color:var(--ink-2);border-bottom:1px solid var(--line-soft);line-height:1.45}
+.state-note strong{color:var(--ink);font-weight:600}
+.feeds{padding:10px 12px;display:flex;flex-wrap:wrap;gap:5px}
+.feeds em{
+  font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--ink-2);
+  border:1px solid var(--line);border-radius:2px;padding:2px 6px;
+}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10.5px}
+.insp table{font-size:9.8px}
+th{
+  text-align:left;font-weight:500;font-size:9px;letter-spacing:.1em;color:var(--ink-3);
+  text-transform:uppercase;padding:6px 6px;border-bottom:1px solid var(--line-soft);
+}
+td{padding:3px 6px;color:var(--ink-2);font-variant-numeric:tabular-nums;border-bottom:1px solid rgba(44,37,23,.45)}
+tr:last-child td{border-bottom:0}
+td.num{text-align:right;color:var(--ink)}
+td.buy{color:var(--ok)}
+td.sell{color:var(--fail)}
+.tbl-wrap{overflow-x:auto}
+.tbl-note{padding:7px 12px;font-family:var(--mono);font-size:9.5px;color:var(--ink-3);border-top:1px solid var(--line-soft)}
+.new-row{animation:flash 1.1s ease-out}
+@keyframes flash{from{background:rgba(227,182,92,.14)}to{background:transparent}}
+
+/* ── Tab lain ─────────────────────────────────────────────────────────────── */
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;padding-top:12px;align-items:start}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.pad{padding:14px}
+.barlist{display:flex;flex-direction:column;gap:11px}
+.barrow{display:grid;grid-template-columns:118px minmax(0,1fr) 62px;align-items:center;gap:10px}
+.barrow .lb{font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+.barrow .lb small{display:block;color:var(--ink-3);font-size:9px;letter-spacing:.08em}
+.barrow .tr{height:14px;background:var(--panel-3);border-radius:0 3px 3px 0}
+.barrow .tr i{display:block;height:100%;background:var(--gold-dim);border-radius:0 3px 3px 0}
+.barrow.hi .tr i{background:var(--gold)}
+.barrow .vl{font-family:var(--mono);font-size:11px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.axis{
+  display:flex;justify-content:space-between;margin:10px 0 0 128px;
+  font-family:var(--mono);font-size:9px;color:var(--ink-3);
+}
+.spark{width:100%;height:140px;display:block}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line-soft)}
+.kpi div{padding:11px 12px;border-right:1px solid var(--line-soft)}
+.kpi div:last-child{border-right:0}
+.kpi span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--ink-3);text-transform:uppercase}
+.kpi b{font-family:var(--mono);font-size:17px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.ladder{display:flex;flex-direction:column}
+.lrow{display:grid;grid-template-columns:minmax(0,1fr) 58px;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line-soft);align-items:center}
+.lrow:last-child{border-bottom:0}
+.lrow.active{background:var(--panel-2);box-shadow:inset 2px 0 0 var(--gold)}
+.lrow p{margin:0;font-size:11.5px;color:var(--ink-2)}
+.lrow p b{display:block;color:var(--ink);font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.02em}
+.lrow .rk{font-family:var(--mono);font-size:13px;text-align:right;color:var(--gold);font-variant-numeric:tabular-nums}
+.lrow.stop .rk{color:var(--fail)}
+.note{padding:11px 12px;font-size:11.5px;color:var(--ink-2);line-height:1.5;border-top:1px solid var(--line-soft)}
+.note a{color:var(--gold)}
+.hours{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:3px;min-width:640px}
+.hr{display:flex;flex-direction:column;gap:4px;align-items:center}
+.hr i{display:block;width:100%;height:40px;border-radius:2px;background:var(--panel-3)}
+.hr.on i{background:var(--gold);opacity:.85}
+.hr.blk i{background:var(--fail-bg);box-shadow:inset 0 0 0 1px var(--fail)}
+.hr span{font-family:var(--mono);font-size:8.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.hr.on span{color:var(--ink-2)}
+.hr.blk span{color:var(--fail)}
+.hkey{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.hkey b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.foot{
+  margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);
+  display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <b>Pipa Data XAU</b>
+      <span class="tick">XAUUSD · SPOT</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Tampilan">
+      <button class="tab" role="tab" id="tab-pipeline" aria-controls="pane-pipeline" aria-selected="true">Pipeline</button>
+      <button class="tab" role="tab" id="tab-vol" aria-controls="pane-vol" aria-selected="false">Volatilitas</button>
+      <button class="tab" role="tab" id="tab-sinyal" aria-controls="pane-sinyal" aria-selected="false">Sinyal</button>
+    </nav>
+    <div class="top-stats">
+      <span class="sim">DATA SIMULASI</span>
+      <div class="live"><span class="dot pulse"></span>STREAM AKTIF</div>
+      <div class="tstat"><span>Node sehat</span><b id="k-nodes">25/25</b></div>
+      <div class="tstat"><span>Gelombang</span><b id="k-wave">#253</b></div>
+      <div class="tstat"><span>Throughput</span><b id="k-tp">4.240/dtk</b></div>
+      <div class="tstat"><span>Lag SLA 15s</span><b id="k-lag">1,03s</b></div>
+    </div>
+  </header>
+
+  <!-- ══ PIPELINE ══════════════════════════════════════════════════════════ -->
+  <section class="pane" id="pane-pipeline" role="tabpanel" aria-labelledby="tab-pipeline">
+    <div class="grid">
+
+      <!-- Rail kiri -->
+      <div class="rail">
+        <div class="card">
+          <h3>Kendali aliran</h3>
+          <div class="rail-body">
+            <div class="ctl">
+              <label for="c-tp">Throughput <i id="v-tp">1,0×</i></label>
+              <input type="range" id="c-tp" min="0.2" max="3" step="0.1" value="1">
+            </div>
+            <div class="ctl">
+              <label for="c-sp">Kecepatan tick <i id="v-sp">2,4/mnt</i></label>
+              <input type="range" id="c-sp" min="0.5" max="4" step="0.1" value="2.4">
+            </div>
+            <div class="btns">
+              <button class="btn break" id="b-break">Rusak node</button>
+              <button class="btn heal" id="b-heal">Pulihkan</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Kesehatan</h3>
+          <div class="health">
+            <div class="hrow"><span><i class="mk fail"></i>Gagal</span><b id="h-fail" style="color:var(--fail)">0</b></div>
+            <div class="hrow"><span><i class="mk warn"></i>Degradasi</span><b id="h-warn" style="color:var(--warn)">0</b></div>
+            <div class="hrow"><span><i class="mk heal"></i>Backfill</span><b id="h-heal" style="color:var(--heal)">0</b></div>
+            <div class="hrow"><span><i class="mk ok"></i>Sehat</span><b id="h-ok" style="color:var(--ok)">25</b></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Baca panggung</h3>
+          <div class="legend">
+            <div><i class="mk ok"></i>SEHAT — lag di dalam SLA</div>
+            <div><i class="mk warn"></i>DEGRADASI — hulu tersendat</div>
+            <div><i class="mk fail"></i>GAGAL — retry &amp; backoff jalan</div>
+            <div><i class="mk heal"></i>BACKFILL — memutar ulang buffer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panggung DAG -->
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div class="card">
+          <h3>Aliran XAUUSD <em style="font-style:normal;color:var(--ink-3)">klik node untuk membedah</em></h3>
+          <div class="stage-wrap">
+            <div class="stage" id="stage">
+              <svg class="edges" id="edges" viewBox="0 0 852 552" aria-hidden="true"></svg>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Log orkestrator <em style="font-style:normal;color:var(--ink-3)" id="log-hint">retry eksponensial, lalu backfill</em></h3>
+          <div class="log" id="log" role="log" aria-live="polite" aria-label="Log orkestrator"></div>
+        </div>
+      </div>
+
+      <!-- Inspektur -->
+      <div class="insp">
+        <div class="card">
+          <div class="insp-head">
+            <div class="lay" id="i-layer">SILVER</div>
+            <h4 id="i-name">xau_ohlcv_m1</h4>
+            <p id="i-desc">Tick spot dipadatkan jadi candle 1 menit.</p>
+            <span class="chip ok" id="i-chip">SEHAT</span>
+          </div>
+          <div class="mtr">
+            <div><span>Baris/dtk</span><b id="i-rate">738</b></div>
+            <div><span>Terlihat</span><b id="i-seen">62,9<small>rb</small></b></div>
+            <div><span>Lag</span><b id="i-lag">1,03<small>s</small></b></div>
+          </div>
+          <div class="state-note" id="i-note"></div>
+          <div class="feeds" id="i-feeds"></div>
+        </div>
+        <div class="card">
+          <h3>Sampel baris — langsung</h3>
+          <div class="tbl-wrap"><table id="i-table"><thead id="i-thead"></thead><tbody id="i-tbody"></tbody></table></div>
+          <div class="tbl-note" id="i-tnote">Satu baris per fill, dihargai terhadap best bid/ask saat order dikirim.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ VOLATILITAS ═══════════════════════════════════════════════════════ -->
+  <section class="pane" id="pane-vol" role="tabpanel" aria-labelledby="tab-vol" hidden>
+    <div class="two">
+      <div class="card">
+        <h3>Rentang rata-rata XAUUSD per sesi <em style="font-style:normal;color:var(--ink-3)">90 hari</em></h3>
+        <div class="pad">
+          <div class="barlist" id="sess"></div>
+          <div class="axis"><span>0</span><span>$12</span><span>$24</span><span>$36</span></div>
+          <p style="margin:14px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.5">
+            Mart <span style="font-family:var(--mono);color:var(--gold)">xau_session_profile</span> memberi tahu penjadwal
+            kapan sinyal M5 boleh hidup. Sesi Asia terlalu sempit untuk TP 8 point — 80 pip butuh rentang yang
+            baru muncul saat London buka.
+          </p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>ATR(14) H1 — rezim volatilitas</h3>
+        <div class="pad"><svg class="spark" id="atr" viewBox="0 0 460 140" role="img" aria-label="Garis ATR 14 pada H1 selama 45 sesi terakhir, naik dari 2,9 ke 4,7 dolar"></svg></div>
+        <div class="kpi">
+          <div><span>ATR sekarang</span><b>$4,72</b></div>
+          <div><span>Persentil 90h</span><b>P78</b></div>
+          <div><span>Rezim</span><b style="color:var(--warn)">EKSPANSI</b></div>
+        </div>
+        <p class="note">
+          Rezim ekspansi memperlebar SL minimum: pada ATR $4,72 stop 4 point (40 pip) hanya 0,85× ATR —
+          <strong style="color:var(--ink)">terlalu rapat</strong>. Gate <span style="font-family:var(--mono);color:var(--gold)">xau_atr_regime</span>
+          menolak setup RR 1:2 sampai stop ≥ 1,2× ATR atau ATR turun ke bawah $4,00.
+        </p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3>Gerbang jam sinyal M5 <em style="font-style:normal;color:var(--ink-3)">waktu WITA</em></h3>
+      <div class="pad">
+        <div style="overflow-x:auto"><div class="hours" id="hours"></div></div>
+        <div class="hkey">
+          <span><b style="background:var(--gold);opacity:.85"></b>Sinyal aktif — rentang sesi cukup untuk TP 8 point</span>
+          <span><b style="background:var(--panel-3)"></b>Pasif — rentang terlalu sempit</span>
+          <span><b style="background:var(--fail-bg);box-shadow:inset 0 0 0 1px var(--fail)"></b>Diblokir xau_news_risk — jendela CPI AS 20:30</span>
+        </div>
+        <p style="margin:14px 0 0;font-size:11.5px;color:var(--ink-2);line-height:1.5;max-width:78ch">
+          Jam 20 tetap tertutup meski overlap NY adalah sesi paling lebar: gerbang berita menang atas gerbang
+          sesi. Urutannya selalu sama — sesi, lalu ATR, lalu berita, lalu pagu risiko — dan sinyal harus lolos
+          keempatnya sebelum jadi order.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SINYAL ════════════════════════════════════════════════════════════ -->
+  <section class="pane" id="pane-sinyal" role="tabpanel" aria-labelledby="tab-sinyal" hidden>
+    <div class="two">
+      <div class="card">
+        <h3>Mart sinyal <em style="font-style:normal;color:var(--ink-3)">sinyal_xau_m5 + sinyal_xau_h4</em></h3>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Waktu</th><th>Sesi</th><th>Arah</th><th>Setup</th><th class="num">Entry</th><th class="num">SL</th><th class="num">TP</th><th class="num">RR</th><th class="num">Risiko</th><th>Hasil</th></tr></thead>
+            <tbody id="sig-body"></tbody>
+          </table>
+        </div>
+        <div class="tbl-note">Semua angka simulasi. Risiko dihitung ulang tiap sinyal oleh mart risiko_eksposur, bukan diisi manual.</div>
+      </div>
+      <div class="card">
+        <h3>Penjaga risiko — tangga de-risking</h3>
+        <div class="ladder">
+          <div class="lrow"><p><b>Normal — equity di puncak</b>Mode standar, ukuran penuh.</p><span class="rk">1,00%</span></div>
+          <div class="lrow active"><p><b>Setelah 2 loss beruntun</b>Pasar mungkin tidak cocok dengan sistem.</p><span class="rk">0,75%</span></div>
+          <div class="lrow"><p><b>Setelah 3 loss beruntun</b>Perlambat kerusakan, cari konfirmasi.</p><span class="rk">0,50%</span></div>
+          <div class="lrow stop"><p><b>Setelah 4 loss beruntun</b>Berhenti hari itu — ini kondisi pasar/emosi.</p><span class="rk">STOP</span></div>
+        </div>
+        <div class="kpi">
+          <div><span>Loss beruntun</span><b id="s-streak" style="color:var(--warn)">2</b></div>
+          <div><span>Risiko aktif</span><b style="color:var(--gold)" id="s-risk">0,75%</b></div>
+          <div><span>DD dari puncak</span><b id="s-dd">−2,4%</b></div>
+        </div>
+        <p class="note">
+          Agen tidak boleh menaikkan lot setelah kalah. Kembali ke 1% hanya setelah equity menyentuh lagi
+          high-water mark — bukan setelah menang sekali. Aturan ini hidup di kode mart, jadi sinyal yang
+          melanggarnya tidak pernah sampai ke eksekusi.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Pipa Data XAU — demo pipeline mandiri-pulih. Angka dihasilkan di browser, bukan feed broker.</span>
+    <span id="f-clock">21:36:18 WITA</span>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var COLX = [4,176,348,520,692];
+var Y6=[40,125,210,295,380,465], Y5=[98,183,268,353,438], Y4=[140,225,310,395];
+
+var NODES = [
+ {id:"s1",n:"xau_spot_feed",     l:0,y:Y6[0],r:4120,s:"tick", d:"Tick bid/ask XAUUSD dari empat likuiditas provider, di-stempel waktu di sisi kami."},
+ {id:"s2",n:"comex_gc_futures",  l:0,y:Y6[1],r:860, s:"tick", d:"Kontrak GC bulan depan di CME — dipakai untuk basis spot-futures dan deteksi rollover."},
+ {id:"s3",n:"dxy_index",         l:0,y:Y6[2],r:320, s:"macro",d:"Indeks dolar per detik. Lawan utama emas."},
+ {id:"s4",n:"us10y_real_yield",  l:0,y:Y6[3],r:12,  s:"macro",d:"Yield riil TIPS 10 tahun — penggerak emas paling lambat tapi paling menentukan."},
+ {id:"s5",n:"kalender_makro",    l:0,y:Y6[4],r:3,   s:"event",d:"FOMC, NFP, CPI: jadwal, konsensus, dan aktual saat rilis."},
+ {id:"s6",n:"cot_etf_flows",     l:0,y:Y6[5],r:2,   s:"macro",d:"Posisi COT mingguan dan arus masuk-keluar ETF emas."},
+
+ {id:"b1",n:"raw_xau_ticks",     l:1,y:Y5[0],r:4120,s:"tick", f:["s1"],     d:"Landing zone tick mentah. Append-only, tidak pernah diubah — sumber kebenaran untuk replay."},
+ {id:"b2",n:"raw_gc_futures",    l:1,y:Y5[1],r:860, s:"tick", f:["s2"],     d:"Tick futures mentah beserta kode kontraknya."},
+ {id:"b3",n:"raw_makro_deret",   l:1,y:Y5[2],r:332, s:"macro",f:["s3","s4"],d:"Deret makro mentah dalam satu tabel panjang: seri, waktu, nilai."},
+ {id:"b4",n:"raw_event_ekonomi", l:1,y:Y5[3],r:3,   s:"event",f:["s5"],     d:"Baris event ekonomi mentah, termasuk revisi yang datang belakangan."},
+ {id:"b5",n:"raw_posisi",        l:1,y:Y5[4],r:2,   s:"macro",f:["s6"],     d:"Snapshot posisi mentah, mingguan."},
+
+ {id:"t1",n:"xau_ohlcv_m1",      l:2,y:Y5[0],r:738, s:"bar",  f:["b1","b2"],d:"Tick dipadatkan jadi candle 1 menit. Dedup, gap-fill, dan penandaan jam libur bursa."},
+ {id:"t2",n:"xau_spread_quality",l:2,y:Y5[1],r:690, s:"tick", f:["b1"],     d:"Spread dan kedalaman per tick. Tick dengan spread di luar wajar dikarantina, bukan dihapus."},
+ {id:"t3",n:"makro_selaras_1m",  l:2,y:Y5[2],r:330, s:"macro",f:["b3"],     d:"DXY dan yield riil diselaraskan ke grid 1 menit yang sama dengan candle emas."},
+ {id:"t4",n:"jendela_event",     l:2,y:Y5[3],r:6,   s:"event",f:["b4"],     d:"Tiap event jadi jendela waktu: 15 menit sebelum sampai 30 menit sesudah rilis."},
+ {id:"t5",n:"posisi_mingguan",   l:2,y:Y5[4],r:2,   s:"macro",f:["b5"],     d:"Posisi bersih spekulan, dinormalisasi ke persentil 3 tahun."},
+
+ {id:"g1",n:"xau_atr_regime",    l:3,y:Y5[0],r:62,  s:"bar",  f:["t1"],     d:"ATR(14) H1 plus label rezim: kontraksi, normal, ekspansi. Gerbang lebar stop minimum."},
+ {id:"g2",n:"xau_session_profile",l:3,y:Y5[1],r:48, s:"bar",  f:["t1"],     d:"Profil rentang per sesi Asia, London, overlap NY — menentukan jam sinyal boleh hidup."},
+ {id:"g3",n:"xau_macro_beta",    l:3,y:Y5[2],r:41,  s:"macro",f:["t3","t5"],d:"Beta emas terhadap DXY dan yield riil, rolling 20 hari."},
+ {id:"g4",n:"xau_signal_features",l:3,y:Y5[3],r:128,s:"sig",  f:["t1","t2"],d:"Tabel fitur yang dibaca model: struktur, momentum, likuiditas, jarak ke level."},
+ {id:"g5",n:"xau_news_risk",     l:3,y:Y5[4],r:9,   s:"event",f:["t4"],     d:"Skor risiko berita per menit. Di atas ambang, entry baru diblokir."},
+
+ {id:"m1",n:"sinyal_xau_m5",     l:4,y:Y4[0],r:34,  s:"sig",  f:["g1","g2","g4","g5"],d:"Sinyal intraday M5. Tiap kandidat wajib lolos gerbang ATR, sesi, dan risiko berita."},
+ {id:"m2",n:"sinyal_xau_h4",     l:4,y:Y4[1],r:11,  s:"sig",  f:["g1","g3","g4"],     d:"Sinyal swing H4, condong ke arah makro: dolar melemah dan yield riil turun."},
+ {id:"m3",n:"risiko_eksposur",   l:4,y:Y4[2],r:18,  s:"sig",  f:["g1","g5"],          d:"Ukuran lot dihitung dari jarak stop dan pagu risiko 1% — bukan diisi manual."},
+ {id:"m4",n:"kualitas_eksekusi", l:4,y:Y4[3],r:24,  s:"exec", f:["t2"],               d:"Tiap fill dinilai terhadap best bid/ask saat order dikirim. Slippage diukur, bukan diasumsikan."}
+];
+var LAYERS=["Sources","Bronze","Silver","Gold","Marts"];
+var byId={}; NODES.forEach(function(n){ n.state="ok"; n.lag=0.6+Math.random()*0.9; n.seen=8000+Math.random()*90000; byId[n.id]=n; });
+var down={}; NODES.forEach(function(n){ (n.f||[]).forEach(function(u){ (down[u]=down[u]||[]).push(n.id); }); });
+
+/* ── render panggung ──────────────────────────────────────────────────────── */
+var stage=document.getElementById("stage"), svg=document.getElementById("edges");
+LAYERS.forEach(function(name,i){
+  var h=document.createElement("div"); h.className="colhead"; h.style.left=COLX[i]+"px";
+  var count=NODES.filter(function(n){return n.l===i;}).length;
+  h.innerHTML=name+'<i>'+count+'</i>'; stage.appendChild(h);
+});
+var edgeEls={};
+NODES.forEach(function(n){
+  (n.f||[]).forEach(function(uid){
+    var u=byId[uid];
+    var x1=COLX[u.l]+152, y1=u.y+32, x2=COLX[n.l], y2=n.y+32, mx=(x1+x2)/2;
+    var p=document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d","M"+x1+","+y1+" C"+mx+","+y1+" "+mx+","+y2+" "+x2+","+y2);
+    p.setAttribute("class","edge"+(reduce?"":" flow"));
+    svg.appendChild(p); (edgeEls[n.id]=edgeEls[n.id]||[]).push(p);
+  });
+});
+NODES.forEach(function(n){
+  var b=document.createElement("button");
+  b.className="node"; b.type="button"; b.dataset.id=n.id; b.dataset.state="ok";
+  b.style.left=COLX[n.l]+"px"; b.style.top=n.y+"px";
+  b.innerHTML='<div class="nm">'+n.n+'</div><div class="st">SEHAT</div>'+
+              '<div class="mt"><span class="rt"></span><span class="lg"></span></div>'+
+              '<div class="bar"><i></i></div>';
+  b.addEventListener("click",function(){ select(n.id); });
+  stage.appendChild(b); n.el=b;
+});
+
+/* ── format ───────────────────────────────────────────────────────────────── */
+function id2(v){ return v.toLocaleString("id-ID"); }
+function dec(v,d){ return v.toLocaleString("id-ID",{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function ribu(v){ return v>=1000? dec(v/1000,1)+"rb" : id2(Math.round(v)); }
+function jam(d){ var p=function(x){return (x<10?"0":"")+x;}; return p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds()); }
+function clockAt(off){ var d=new Date(Date.now()-(off||0)*1000); return jam(new Date(d.getTime()+(8*60+d.getTimezoneOffset())*60000)); }
+function clock(){ return clockAt(0); }
+
+/* ── state ────────────────────────────────────────────────────────────────── */
+var tpMul=1, tickSpeed=2.4, wave=253, sel="t1", timers=[];
+var STATE_LABEL={ok:"SEHAT",degraded:"DEGRADASI",failing:"GAGAL",backfill:"BACKFILL"};
+var STATE_NOTE={
+  ok:"Node menulis di dalam SLA. Watermark maju tiap micro-batch dan tidak ada baris yang tertahan.",
+  degraded:"Hulu tersendat. Node ini masih jalan, tapi memakai partisi lengkap terakhir — hasilnya sah, hanya basi.",
+  failing:"Batch gagal. Orkestrator retry dengan backoff eksponensial; baris masuk ditahan di buffer, tidak dibuang.",
+  backfill:"Memutar ulang baris buffer di luar urutan. Lag sengaja naik dulu sampai backlog terkuras."
+};
+function rateOf(n){
+  var base=n.r*tpMul;
+  if(n.state==="failing") return 0;
+  if(n.state==="degraded") return base*(0.35+Math.random()*0.15);
+  if(n.state==="backfill") return base*(2.1+Math.random()*0.5);
+  return base*(0.94+Math.random()*0.12);
+}
+function paint(){
+  var c={ok:0,degraded:0,failing:0,backfill:0}, maxLag=0, tp=0;
+  NODES.forEach(function(n){
+    c[n.state]++;
+    var r=rateOf(n); n.cur=r; n.seen+=r*0.9;
+    if(n.state==="failing") n.lag=Math.min(38,n.lag+1.4);
+    else if(n.state==="degraded") n.lag=Math.min(22,n.lag+0.5);
+    else if(n.state==="backfill") n.lag=Math.max(1.2,n.lag-1.1);
+    else n.lag=Math.max(0.5,n.lag*0.7+(0.6+Math.random()*0.8)*0.3);
+    if(n.l===0) tp+=r;
+    if(n.lag>maxLag) maxLag=n.lag;
+    var el=n.el; el.dataset.state=n.state;
+    el.querySelector(".st").textContent=STATE_LABEL[n.state];
+    el.querySelector(".rt").textContent=ribu(r)+"/dtk";
+    el.querySelector(".lg").textContent="lag "+dec(n.lag,2)+"s";
+    el.querySelector(".bar i").style.width=Math.max(4,Math.min(100,(r/(n.r*3))*100))+"%";
+    (edgeEls[n.id]||[]).forEach(function(p){
+      p.setAttribute("class","edge"+(n.state==="failing"?" dead":(reduce?"":" flow")));
+    });
+  });
+  document.getElementById("h-ok").textContent=c.ok;
+  document.getElementById("h-warn").textContent=c.degraded;
+  document.getElementById("h-fail").textContent=c.failing;
+  document.getElementById("h-heal").textContent=c.backfill;
+  document.getElementById("k-nodes").textContent=c.ok+"/"+NODES.length;
+  document.getElementById("k-tp").textContent=ribu(tp)+"/dtk";
+  document.getElementById("k-lag").textContent=dec(maxLag,2)+"s";
+  document.getElementById("f-clock").textContent=clock()+" WITA";
+  var d=document.querySelector(".live .dot"), lv=document.querySelector(".live");
+  if(c.failing){ d.style.background="var(--fail)"; d.style.boxShadow="0 0 0 3px var(--fail-bg)"; lv.style.color="var(--fail)"; lv.lastChild.textContent="PULIH OTOMATIS"; }
+  else { d.style.background="var(--ok)"; d.style.boxShadow="0 0 0 3px var(--ok-bg)"; lv.style.color="var(--ok)"; lv.lastChild.textContent="STREAM AKTIF"; }
+  if(sel) fillInspector();
+}
+
+/* ── log ──────────────────────────────────────────────────────────────────── */
+var logEl=document.getElementById("log");
+var lastLog="";
+function say(kind,who,msg,off){
+  if(who+msg===lastLog) return; lastLog=who+msg;
+  var p=document.createElement("p"); p.className=kind;
+  p.innerHTML='<time>'+clockAt(off)+'</time><em>'+who+'</em><b>'+msg+'</b>';
+  logEl.insertBefore(p,logEl.firstChild);
+  while(logEl.childNodes.length>44) logEl.removeChild(logEl.lastChild);
+}
+var ROUTINE=[
+  ["ok","xau_ohlcv_m1",function(){return id2(1200+Math.floor(Math.random()*600))+" baris dipadatkan — "+(2+Math.floor(Math.random()*7))+" tick duplikat dibuang";}],
+  ["info","xau_spread_quality",function(){return "spread median "+dec(0.22+Math.random()*0.12,2)+" · "+(1+Math.floor(Math.random()*5))+" outlier dikarantina";}],
+  ["info","sinyal_xau_m5",function(){return "1 kandidat ditolak — gerbang ATR: stop < 1,2x ATR";}],
+  ["ok","risiko_eksposur",function(){return "eksposur "+dec(0.6+Math.random()*0.35,2)+"% equity, di bawah pagu 1,00%";}],
+  ["info","kualitas_eksekusi",function(){return "slippage p95 "+dec(0.22+Math.random()*0.18,2)+" point pada "+(6+Math.floor(Math.random()*20))+" fill";}],
+  ["info","jendela_event",function(){return "2 jendela berita terbuka — CPI AS 20:30 WITA";}],
+  ["ok","orkestrator",function(){return "heartbeat — watermark maju, semua partisi tertutup";}],
+  ["info","xau_macro_beta",function(){return "beta DXY "+dec(-1.4-Math.random()*0.5,2)+" · yield riil "+dec(-0.7-Math.random()*0.4,2);}],
+  ["ok","xau_session_profile",function(){return "sesi overlap dibuka — rentang rata-rata $33,60, sinyal M5 diaktifkan";}]
+];
+var FAILURES=[
+  "koneksi LP putus — heartbeat hilang 3 detik",
+  "merge conflict pada SCD-2 saat penutupan partisi",
+  "skema berubah — kolom bid_size datang sebagai string",
+  "checkpoint tertinggal — watermark mundur dari hulu",
+  "batas memori kena saat window join 30 menit"
+];
+
+/* ── kerusakan & pemulihan ────────────────────────────────────────────────── */
+function descendants(id,acc){
+  acc=acc||{}; (down[id]||[]).forEach(function(d){ if(!acc[d]){ acc[d]=1; descendants(d,acc); } });
+  return acc;
+}
+function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
+function breakNode(id){
+  var n=byId[id]; if(!n||n.state!=="ok") return;
+  n.state="failing"; n.lag=Math.max(n.lag,3.2);
+  var ds=descendants(id); Object.keys(ds).forEach(function(d){ if(byId[d].state==="ok") byId[d].state="degraded"; });
+  say("fail",n.n,"GAGAL — "+FAILURES[Math.floor(Math.random()*FAILURES.length)]);
+  var kena=Object.keys(ds).length;
+  if(kena) say("warn","orkestrator",kena+" node hilir turun ke DEGRADASI — memakai partisi lengkap terakhir");
+  var buf=1200+Math.floor(Math.random()*2600);
+  later(function(){ say("warn",n.n,"retry 1/3 gagal — backoff 1,5s"); },1700);
+  later(function(){ say("warn",n.n,"retry 2/3 gagal — backoff 3,0s · "+id2(buf)+" baris ditahan di buffer"); },3600);
+  later(function(){
+    if(n.state!=="failing") return;
+    n.state="backfill";
+    say("heal",n.n,"BACKFILL — memutar ulang "+id2(buf)+" baris buffer, throughput 2,3x");
+  },5600);
+  later(function(){
+    if(n.state!=="backfill") return;
+    n.state="ok"; n.lag=1.1;
+    say("ok",n.n,"pulih di retry 3 — backlog terkuras, lag kembali di dalam SLA 15s");
+    Object.keys(ds).forEach(function(d,i){
+      later(function(){
+        if(byId[d].state==="degraded"){ byId[d].state="ok"; byId[d].lag=1.0; }
+        if(i===Object.keys(ds).length-1) say("ok","orkestrator","seluruh hilir sehat kembali tanpa intervensi manual");
+      },260*(i+1));
+    });
+  },9200);
+}
+document.getElementById("b-break").addEventListener("click",function(){
+  var pool=NODES.filter(function(n){ return n.state==="ok" && n.l<4; });
+  if(!pool.length){ say("info","orkestrator","tidak ada node sehat untuk dirusak"); return; }
+  breakNode(pool[Math.floor(Math.random()*pool.length)].id);
+});
+document.getElementById("b-heal").addEventListener("click",function(){
+  timers.forEach(clearTimeout); timers=[];
+  NODES.forEach(function(n){ n.state="ok"; n.lag=0.9; });
+  say("ok","orkestrator","pemulihan manual — 25/25 node sehat, watermark disinkronkan ulang");
+  paint();
+});
+document.getElementById("c-tp").addEventListener("input",function(e){
+  tpMul=parseFloat(e.target.value);
+  document.getElementById("v-tp").textContent=dec(tpMul,1)+"x";
+});
+document.getElementById("c-sp").addEventListener("input",function(e){
+  tickSpeed=parseFloat(e.target.value);
+  document.getElementById("v-sp").textContent=dec(tickSpeed,1)+"/mnt";
+});
+
+/* ── sampel baris ─────────────────────────────────────────────────────────── */
+var px=4182.50;
+function walk(){ px+=(Math.random()-0.5)*0.9; return px; }
+var SHAPES={
+  tick:{h:["Waktu","Bid","Ask","Spread","Vol"],note:"Tick mentah XAUUSD, satu baris per pembaruan kuotasi.",row:function(){
+    var b=walk(), sp=0.20+Math.random()*0.22;
+    return [clock(),dec(b,2),dec(b+sp,2),dec(sp,2),id2(2+Math.floor(Math.random()*40))];}},
+  bar:{h:["Menit","Open","High","Low","Close"],note:"Candle M1 hasil pemadatan tick, gap jam libur ditandai bukan diisi.",row:function(){
+    var o=walk(), c=o+(Math.random()-0.5)*1.6, hi=Math.max(o,c)+Math.random()*0.7, lo=Math.min(o,c)-Math.random()*0.7;
+    return [clock(),dec(o,2),dec(hi,2),dec(lo,2),dec(c,2)];}},
+  macro:{h:["Waktu","Seri","Nilai","Δ 1j"],note:"Deret makro yang diselaraskan ke grid menit yang sama dengan emas.",row:function(){
+    var seri=["DXY","US10Y_REAL","DXY","GLD_FLOW"][Math.floor(Math.random()*4)];
+    var v=seri==="DXY"?98+Math.random()*1.2:(seri==="US10Y_REAL"?1.6+Math.random()*0.2:120+Math.random()*40);
+    return [clock(),seri,dec(v,seri==="US10Y_REAL"?3:2),(Math.random()<0.5?"−":"+")+dec(Math.random()*0.35,2)];}},
+  event:{h:["Jendela","Event","Dampak","Status"],note:"Tiap event jadi jendela 15 menit sebelum sampai 30 menit sesudah rilis.",row:function(){
+    var e=[["CPI AS","TINGGI"],["Klaim pengangguran","SEDANG"],["Pidato FOMC","TINGGI"],["PMI Jasa","RENDAH"]][Math.floor(Math.random()*4)];
+    return [clock(),e[0],e[1],Math.random()<0.35?"TERBUKA":"terjadwal"];}},
+  sig:{h:["Waktu","Arah","Setup","RR","Risiko"],note:"Kandidat sinyal setelah gerbang ATR, sesi, dan risiko berita.",row:function(){
+    var buy=Math.random()<0.5;
+    var st=["Break struktur","Rejeksi VWAP","Retest supply","Sweep likuiditas"][Math.floor(Math.random()*4)];
+    var tolak=Math.random()<0.3;
+    return [clock(),buy?"BUY":"SELL",st,tolak?"—":"1:"+(2+Math.floor(Math.random()*2)),tolak?"DITOLAK":dec(0.5+Math.random()*0.5,2)+"%"];}},
+  exec:{h:["Waktu","Order","Arah","Lot","Harga","Slip"],note:"Satu baris per fill, dihargai terhadap best bid/ask saat order dikirim.",row:function(){
+    var buy=Math.random()<0.5, p=walk();
+    return [clock(),"042"+(10000+Math.floor(Math.random()*89999)),buy?"BUY":"SELL",dec(0.01+Math.random()*0.06,2),dec(p,2),dec(Math.random()*0.4,2)];}}
+};
+var thead=document.getElementById("i-thead"), tbody=document.getElementById("i-tbody");
+function shapeOf(n){ return SHAPES[n.s]||SHAPES.tick; }
+function drawHead(n){
+  var sh=shapeOf(n);
+  thead.innerHTML="<tr>"+sh.h.map(function(h,i){ return "<th"+(i>1?' class="num"':"")+">"+h+"</th>"; }).join("")+"</tr>";
+  document.getElementById("i-tnote").textContent=sh.note;
+  tbody.innerHTML="";
+  for(var i=0;i<7;i++) addRow(n,true);
+}
+function addRow(n,seed){
+  var sh=shapeOf(n), cells=sh.row(), tr=document.createElement("tr");
+  if(!seed && !reduce) tr.className="new-row";
+  tr.innerHTML=cells.map(function(c,i){
+    var cls=i>1?"num":"";
+    if(c==="BUY") cls="buy"; if(c==="SELL") cls="sell";
+    if(c==="DITOLAK"||c==="TERBUKA") cls="num";
+    return "<td"+(cls?' class="'+cls+'"':"")+">"+c+"</td>";
+  }).join("");
+  tbody.insertBefore(tr,tbody.firstChild);
+  while(tbody.childNodes.length>7) tbody.removeChild(tbody.lastChild);
+}
+
+/* ── inspektur ────────────────────────────────────────────────────────────── */
+function select(id){
+  sel=id;
+  NODES.forEach(function(n){ n.el.classList.toggle("sel",n.id===id); });
+  var n=byId[id];
+  document.getElementById("i-layer").textContent=LAYERS[n.l];
+  document.getElementById("i-name").textContent=n.n;
+  document.getElementById("i-desc").textContent=n.d;
+  document.getElementById("i-feeds").innerHTML=(n.f||[]).length
+    ? '<em style="border:0;padding-left:0;color:var(--ink-3)">hulu</em>'+n.f.map(function(u){return "<em>"+byId[u].n+"</em>";}).join("")
+    : '<em style="border:0;padding-left:0;color:var(--ink-3)">hulu</em><em>feed eksternal</em>';
+  drawHead(n); fillInspector();
+}
+function fillInspector(){
+  var n=byId[sel];
+  var chip=document.getElementById("i-chip");
+  chip.className="chip "+n.state; chip.textContent=STATE_LABEL[n.state];
+  document.getElementById("i-note").innerHTML=STATE_NOTE[n.state];
+  document.getElementById("i-rate").textContent=ribu(n.cur||n.r);
+  document.getElementById("i-seen").innerHTML=dec(n.seen/1000,1)+'<small>rb</small>';
+  document.getElementById("i-lag").innerHTML=dec(n.lag,2)+'<small>s</small>';
+}
+
+/* ── denyut ───────────────────────────────────────────────────────────────── */
+paint(); select("t1");
+for(var i=8;i>0;i--) (function(k){ var r=ROUTINE[Math.floor(Math.random()*ROUTINE.length)]; say(r[0],r[1],r[2](),k*4+Math.floor(Math.random()*5)); })(i);
+setInterval(paint,900);
+setInterval(function(){ addRow(byId[sel],false); },1200);
+var waveAcc=0;
+setInterval(function(){
+  waveAcc+=tickSpeed/60;
+  if(waveAcc>=1){ wave+=Math.floor(waveAcc); waveAcc%=1; document.getElementById("k-wave").textContent="#"+wave; }
+},1000);
+setInterval(function(){
+  if(document.getElementById("pane-pipeline").hidden) return;
+  var r=ROUTINE[Math.floor(Math.random()*ROUTINE.length)]; say(r[0],r[1],r[2]());
+},2600);
+setTimeout(function(){ if(!reduce) breakNode("t1"); },7000);
+
+/* ── tab ──────────────────────────────────────────────────────────────────── */
+var tabs=[["tab-pipeline","pane-pipeline"],["tab-vol","pane-vol"],["tab-sinyal","pane-sinyal"]];
+tabs.forEach(function(t){
+  document.getElementById(t[0]).addEventListener("click",function(){
+    tabs.forEach(function(o){
+      var on=o[0]===t[0];
+      document.getElementById(o[0]).setAttribute("aria-selected",on?"true":"false");
+      document.getElementById(o[1]).hidden=!on;
+    });
+  });
+});
+
+/* ── tab volatilitas ──────────────────────────────────────────────────────── */
+var SESI=[
+  ["Asia","07:00–14:00 WITA",9.4],["Pra-London","14:00–15:00",6.1],
+  ["London","15:00–20:00",21.8],["Overlap NY","20:30–23:00",33.6],["NY sore","23:00–04:00",17.2]
+];
+document.getElementById("sess").innerHTML=SESI.map(function(s){
+  var hi=s[2]===33.6;
+  return '<div class="barrow'+(hi?" hi":"")+'"><div class="lb">'+s[0]+'<small>'+s[1]+'</small></div>'+
+         '<div class="tr"><i style="width:'+(s[2]/36*100)+'%"></i></div>'+
+         '<div class="vl">$'+dec(s[2],2)+'</div></div>';
+}).join("");
+
+(function atr(){
+  var pts=[], v=2.92;
+  for(var i=0;i<45;i++){ v+=0.041+Math.sin(i/4.2)*0.075+(i%7===0?-0.11:0.02); pts.push(Math.max(2.5,v)); }
+  pts[44]=4.72;
+  var lo=2.7, hi=5.0, x0=34, x1=448, y0=18, y1=112;
+  var X=function(i){ return x0+(x1-x0)*i/(pts.length-1); };
+  var Y=function(v){ return y1-(y1-y0)*(v-lo)/(hi-lo); };
+  var line=pts.map(function(p,i){ return (i?"L":"M")+dec(X(i),1).replace(",",".")+","+dec(Y(p),1).replace(",","."); }).join(" ");
+  var area=line+" L"+X(pts.length-1).toFixed(1)+","+y1+" L"+x0+","+y1+" Z";
+  var g='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#E3B65C" stop-opacity=".28"/><stop offset="1" stop-color="#E3B65C" stop-opacity="0"/></linearGradient></defs>';
+  g+='<line x1="'+x0+'" y1="'+Y(4).toFixed(1)+'" x2="'+x1+'" y2="'+Y(4).toFixed(1)+'" stroke="#2C2517" stroke-width="1" stroke-dasharray="3 4"/>';
+  g+='<text x="'+x0+'" y="'+(Y(4)-4).toFixed(1)+'" fill="#6E6656" font-family="IBM Plex Mono, monospace" font-size="8.5">ambang $4,00</text>';
+  g+='<path d="'+area+'" fill="url(#ag)" stroke="none"/>';
+  g+='<path d="'+line+'" fill="none" stroke="#E3B65C" stroke-width="2" stroke-linejoin="round"/>';
+  g+='<circle cx="'+X(44).toFixed(1)+'" cy="'+Y(4.72).toFixed(1)+'" r="4" fill="#E3B65C" stroke="#15120D" stroke-width="2"/>';
+  g+='<text x="4" y="'+(Y(5)+3).toFixed(1)+'" fill="#6E6656" font-family="IBM Plex Mono, monospace" font-size="8.5">$5,0</text>';
+  g+='<text x="4" y="'+(Y(2.7)).toFixed(1)+'" fill="#6E6656" font-family="IBM Plex Mono, monospace" font-size="8.5">$2,7</text>';
+  g+='<text x="'+(X(44)-9).toFixed(1)+'" y="'+(Y(4.72)-11).toFixed(1)+'" text-anchor="end" fill="#F3ECDD" font-family="IBM Plex Mono, monospace" font-size="9.5">$4,72</text>';
+  g+='<text x="'+x0+'" y="133" fill="#6E6656" font-family="IBM Plex Mono, monospace" font-size="8.5">45 sesi lalu</text>';
+  g+='<text x="'+x1+'" y="133" text-anchor="end" fill="#6E6656" font-family="IBM Plex Mono, monospace" font-size="8.5">hari ini</text>';
+  document.getElementById("atr").innerHTML=g;
+})();
+
+
+/* ── gerbang jam ──────────────────────────────────────────────────────────── */
+var AKTIF={15:1,16:1,17:1,18:1,19:1,21:1,22:1,23:1,0:1,1:1};
+var hstr="";
+for(var h=0;h<24;h++){
+  var cls=h===20?"hr blk":(AKTIF[h]?"hr on":"hr");
+  hstr+='<div class="'+cls+'" title="'+(h<10?"0":"")+h+':00 WITA"><i></i><span>'+(h<10?"0":"")+h+'</span></div>';
+}
+document.getElementById("hours").innerHTML=hstr;
+
+/* ── tab sinyal ───────────────────────────────────────────────────────────── */
+var SIG=[
+ ["21:12","Overlap NY","SELL","Rejeksi VWAP +2σ","4182,60","4186,60","4174,60","1:2","0,75%","BERJALAN"],
+ ["20:35","London","BUY","Break struktur H1","4176,20","4172,20","4184,20","1:2","1,00%","KALAH"],
+ ["19:48","London","BUY","Retest supply gagal","4171,90","4167,90","4179,90","1:2","1,00%","KALAH"],
+ ["18:05","London","SELL","Sweep likuiditas","4180,40","4184,40","4172,40","1:2","1,00%","MENANG"],
+ ["16:20","London","SELL","Break struktur H1","4188,10","4184,10","4180,10","1:2","1,00%","MENANG"],
+ ["14:40","Pra-London","BUY","Rejeksi VWAP +2σ","—","—","—","—","—","DITOLAK · sesi"],
+ ["11:15","Asia","BUY","Sweep likuiditas","—","—","—","—","—","DITOLAK · ATR"],
+ ["09:02","Asia","SELL","Retest supply","4165,30","4161,30","4157,30","1:2","1,00%","MENANG"]
+];
+document.getElementById("sig-body").innerHTML=SIG.map(function(r){
+  var warna=r[9]==="MENANG"?"var(--ok)":r[9]==="KALAH"?"var(--fail)":r[9]==="BERJALAN"?"var(--gold)":"var(--ink-3)";
+  return "<tr><td>"+r[0]+"</td><td>"+r[1]+"</td>"+
+    '<td class="'+(r[2]==="BUY"?"buy":"sell")+'">'+r[2]+"</td><td>"+r[3]+"</td>"+
+    '<td class="num">'+r[4]+'</td><td class="num">'+r[5]+'</td><td class="num">'+r[6]+'</td>'+
+    '<td class="num">'+r[7]+'</td><td class="num">'+r[8]+'</td>'+
+    '<td style="color:'+warna+'">'+r[9]+"</td></tr>";
+}).join("");
+})();
+</script>
