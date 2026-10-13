@@ -1,20 +1,5 @@
 {
   "sent_ids": [
-    "528dd9b9c9ffc9b3",
-    "4fa9c62d2504fa12",
-    "b7bda1d7da914dcc",
-    "44a14f8fae33ccb0",
-    "86454931f5cbea45",
-    "dc9cb6e356ba7880",
-    "830f53ac2175cb82",
-    "9950671e784cbbf6",
-    "ac6eca511c52574f",
-    "d886771cb451faee",
-    "999b64b59d8ec524",
-    "35fd54407f365b4c",
-    "49f8a0a12a4e05fb",
-    "efff5224ac544c6e",
-    "30dc2dc15109f04d",
     "d2e504e092153d8d",
     "926e1bedeaa82010",
     "df3ef6b6e0e8c6ee",
@@ -1999,7 +1984,22 @@
     "99b78ed712845a6c",
     "4e8c6c305aded4cc",
     "9b8d17549bc1c224",
-    "1b83e0ec6fdf9bd7"
+    "1b83e0ec6fdf9bd7",
+    "78b64275acadc105",
+    "4289d83f27df7e17",
+    "66091b6b48c9bcca",
+    "442ed23bc476331d",
+    "f2a1dbb1190685d9",
+    "ac10eadd08e59c8e",
+    "77b1a714ba9e72f7",
+    "0e2d64b47c9eea39",
+    "ad31d0e31d78690c",
+    "2e9df1eff0ee7652",
+    "a0efb1c6dd768333",
+    "a4bef92b34586cbf",
+    "e4ff520439ebc4a8",
+    "dca4c53f4fa51d83",
+    "702e7bb5b607fa7e"
   ],
-  "last_run": "2026-10-12T23:47:56.512681+00:00"
+  "last_run": "2026-10-13T03:58:02.707830+00:00"
 }
